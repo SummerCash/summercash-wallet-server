@@ -13,3 +13,6 @@
 
 # VS Code Prefs
 .vscode/
+
+# Test Data
+common/test/
