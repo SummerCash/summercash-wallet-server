@@ -45,6 +45,14 @@ func main() {
 	if err != nil { // Check for errors
 		panic(err) // Panic
 	}
+
+	err = startNode() // Start node
+
+	if err != nil { // Check for errors
+		logger.Criticalf("main panicked: %s", err.Error()) // Log pending panic
+
+		panic(err) // Panic
+	}
 }
 
 // configureLogger configures the summercash-wallet-server logger.
