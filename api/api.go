@@ -12,4 +12,6 @@ type API interface {
 	GetInputType() string // GetInputType returns the APIs input type (e.g. form data, JSON, protobuf).
 
 	GetResponseType() string // GetResponseType returns the APIs response type (e.g. JSON).
+
+	StartServing() error // Start serving starts serving the given API.
 }
