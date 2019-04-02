@@ -19,6 +19,12 @@ import (
 var (
 	// ErrAccountAlreadyExists is an error definition describing an attempted duplicate put.
 	ErrAccountAlreadyExists = errors.New("account already exists")
+
+	// ErrAccountDoesNotExist is an error definition describing an account value of nil.
+	ErrAccountDoesNotExist = errors.New("no account exists with the given username")
+
+	// ErrPasswordInvalid is an error definition describing an invalid password value.
+	ErrPasswordInvalid = errors.New("invalid password")
 )
 
 var (
@@ -55,7 +61,7 @@ func OpenDB() (*DB, error) {
 
 // CreateNewAccount creates a new account with a given name and password.
 // Returns the new account's address and an error (if applicable).
-func (db *DB) CreateNewAccount(name string, passwordHash []byte) (string, error) {
+func (db *DB) CreateNewAccount(name string, password string) (string, error) {
 	account, err := accounts.NewAccount() // Create new account
 
 	if err != nil { // Check for errors
@@ -63,9 +69,9 @@ func (db *DB) CreateNewAccount(name string, passwordHash []byte) (string, error)
 	}
 
 	accountInstance := &Account{
-		Name:         name,            // Set name
-		PasswordHash: passwordHash,    // Set password hash
-		Address:      account.Address, // Set address
+		Name:         name,                          // Set name
+		PasswordHash: crypto.Salt([]byte(password)), // Set password hash
+		Address:      account.Address,               // Set address
 	}
 
 	err = db.DB.Update(func(tx *bolt.Tx) error {
@@ -87,6 +93,62 @@ func (db *DB) CreateNewAccount(name string, passwordHash []byte) (string, error)
 	}
 
 	return account.Address.String(), nil // Return address
+}
+
+// ResetAccountPassword resets an accounts password.
+func (db *DB) ResetAccountPassword(name string, oldPassword string, newPassword string) error {
+	account, err := db.QueryAccountByUsername(name) // Query by username
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	valid := crypto.VerifySalted(account.PasswordHash, oldPassword) // Verify salt
+
+	if valid != true { // Check for errors
+		return ErrPasswordInvalid // Return found error
+	}
+
+	(*account).PasswordHash = crypto.Salt([]byte(newPassword)) // Set salt
+
+	return db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket, err := tx.CreateBucketIfNotExists(accountsBucket) // Create accounts bucket
+
+		if err != nil { // Check for errors
+			return err // Return found error
+		}
+
+		return accountsBucket.Put(crypto.Sha3([]byte(name)), account.Bytes()) // Put account
+	}) // Update account info
+}
+
+// QueryAccountByUsername queries the database for an account with a given username.
+func (db *DB) QueryAccountByUsername(name string) (*Account, error) {
+	var accountBuffer *Account // Initialize account buffer
+
+	err := db.DB.View(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(accountsBucket) // Get account bucket
+
+		if err != nil { // Check for errors
+			return err // Return found error
+		}
+
+		accountBytes := bucket.Get(crypto.Sha3([]byte(name))) // Get account at hash
+
+		if accountBytes == nil { // Check no account at hash
+			return ErrAccountDoesNotExist // Return error
+		}
+
+		accountBuffer, err = AccountFromBytes(accountBytes) // Deserialize account bytes
+
+		return err // Return error
+	}) // Read account
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	return accountBuffer, nil // Return read account
 }
 
 /* END EXPORTED METHODS */

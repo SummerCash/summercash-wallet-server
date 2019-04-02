@@ -24,7 +24,7 @@ func TestBytesAccount(t *testing.T) {
 
 	account := &Account{
 		Name:         "Dowland Aiello",                               // Set name
-		PasswordHash: crypto.Sha3([]byte("despacito_despacito_lol")), // Set password
+		PasswordHash: crypto.Salt([]byte("despacito_despacito_lol")), // Set password
 		Address:      address,                                        // Set address
 	}
 
