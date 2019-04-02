@@ -1,7 +1,10 @@
 // Package api defines the summercash-wallet-server API.
 package api
 
-import "github.com/buaazp/fasthttprouter"
+import (
+	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/buaazp/fasthttprouter"
+)
 
 // StandardJSONHTTPAPI is an instance of an API providing the standard API set via https/2 JSON.
 type StandardJSONHTTPAPI struct {
@@ -9,16 +12,19 @@ type StandardJSONHTTPAPI struct {
 
 	Provider string `json:"provider"` // Node provider
 
-	Router *fasthttprouter.Router `json:"router"` // Router
+	Router *fasthttprouter.Router `json:"-"` // Router
+
+	AccountsDatabase *accounts.DB `json:"-"` // Accounts database
 }
 
 /* BEGIN EXPORTED METHODS */
 
 // NewStandardJSONHTTPAPI initializes a new StandardJSONHTTPAPI instance.
-func NewStandardJSONHTTPAPI(baseURI string, provider string) *StandardJSONHTTPAPI {
+func NewStandardJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB) *StandardJSONHTTPAPI {
 	return &StandardJSONHTTPAPI{
-		BaseURI:  baseURI,  // Set base URI
-		Provider: provider, // Set provider
+		BaseURI:          baseURI,    // Set base URI
+		Provider:         provider,   // Set provider
+		AccountsDatabase: accountsDB, // Set accounts DB
 	}
 }
 
