@@ -7,13 +7,18 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/SummerCash/go-summercash/accounts"
 	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/crypto"
 
 	"github.com/boltdb/bolt"
 	"github.com/juju/loggo"
 )
 
 var (
+	// accountsBucket is the accounts bucket key definition.
+	accountsBucket = []byte("accounts")
+
 	// logger is the db package logger.
 	logger = getDBLogger()
 )
@@ -40,6 +45,38 @@ func OpenDB() (*DB, error) {
 	return &DB{
 		DB: db, // Set DB
 	}, nil // Return initialized db
+}
+
+// CreateNewAccount creates a new account with a given name and password.
+// Returns the new account's address and an error (if applicable).
+func (db *DB) CreateNewAccount(name string, passwordHash []byte) (string, error) {
+	account, err := accounts.NewAccount() // Create new account
+
+	if err != nil { // Check for errors
+		return "", err // Return found error
+	}
+
+	accountInstance := &Account{
+		Name:         name,            // Set name
+		PasswordHash: passwordHash,    // Set password hash
+		Address:      account.Address, // Set address
+	}
+
+	err = db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket, err := tx.CreateBucketIfNotExists(accountsBucket) // Create accounts bucket
+
+		if err != nil { // Check for errors
+			return err // Return found error
+		}
+
+		return accountsBucket.Put(crypto.Sha3([]byte(name)), accountInstance.Bytes()) // Put account
+	}) // Add new account to DB
+
+	if err != nil { // Check for errors
+		return "", err // Return found error
+	}
+
+	return account.Address.String(), nil // Return address
 }
 
 /* END EXPORTED METHODS */
