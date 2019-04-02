@@ -16,3 +16,6 @@
 
 # Test Data
 common/test/
+
+# Private Keys
+*.pem
