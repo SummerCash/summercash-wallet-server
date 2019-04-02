@@ -16,8 +16,8 @@ func Salt(b []byte) []byte {
 }
 
 // VerifySalted - verify the contents of a salted hash
-func VerifySalted(salted []byte, sha3 []byte) bool {
-	err := bcrypt.CompareHashAndPassword(salted, sha3) // Verify
+func VerifySalted(salted []byte, password string) bool {
+	err := bcrypt.CompareHashAndPassword(salted, []byte(password)) // Verify
 
 	if err != nil { // Check for errors
 		return false // Invalid

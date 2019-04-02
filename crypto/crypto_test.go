@@ -1,8 +1,27 @@
 package crypto
 
 import (
+	"bytes"
 	"testing"
 )
+
+// TestSalt tests the functionality of the Salt() method.
+func TestSalt(t *testing.T) {
+	salted := Salt([]byte("test")) // Salt
+
+	if bytes.Equal([]byte("test"), salted) { // Check equal
+		t.Fatal("salt should not be same as pass") // Panic
+	}
+}
+
+// TestVerifySalted tests the functionality of the VerifySalted() method.
+func TestVerifySalted(t *testing.T) {
+	salted := Salt([]byte("test")) // Salt
+
+	if !VerifySalted(salted, "test") { // Verify salted
+		t.Fatal("salt not valid") // Panic
+	}
+}
 
 // TestSha3 - test functionality of sha3 hashing function
 func TestSha3(t *testing.T) {
