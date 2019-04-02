@@ -14,6 +14,7 @@ github.com/SummerCash/wagon v0.4.0 h1:jxjRC3tDkbwi8loj7aAeGCa/DSBaTthkCSl69kQqGS
 github.com/SummerCash/wagon v0.4.0/go.mod h1:ihol5QgwyT437ztdqh2Jk87maN4oHZFY/wcZ73LlSQU=
 github.com/aead/siphash v1.0.1/go.mod h1:Nywa3cDsYNNK3gaciGTWPwHt0wlpNV15vwmswBAUSII=
 github.com/bifurcation/mint v0.0.0-20181105073638-824af6541065/go.mod h1:zVt7zX3K/aDCk9Tj+VM7YymsX66ERvzCJzw8rFCX2JU=
+github.com/boltdb/bolt v1.3.1 h1:JQmyP4ZBrce+ZQu0dY660FMfatumYDLun9hBCUVIkF4=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/briandowns/spinner v0.0.0-20180626164024-5b875a9171af/go.mod h1:hw/JEQBIE+c/BLI4aKM8UU8v+ZqrD3h7HC27kKt8JQU=
 github.com/briandowns/spinner v0.0.0-20190212173954-5cf08d0ac778/go.mod h1:hw/JEQBIE+c/BLI4aKM8UU8v+ZqrD3h7HC27kKt8JQU=

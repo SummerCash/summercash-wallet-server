@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/SummerCash/go-summercash v0.5.1
+	github.com/boltdb/bolt v1.3.1
 	github.com/briandowns/spinner v0.0.0-20190319032542-ac46072a5a91 // indirect
 	github.com/buaazp/fasthttprouter v0.1.1
 	github.com/dowlandaiello/GoP2P v0.0.0-20190310032419-c729bb3725f1 // indirect

@@ -11,6 +11,9 @@ var (
 	// DataDir is the global data directory definition.
 	DataDir = getDataDir()
 
+	// DBDir is the global db directory definition.
+	DBDir = filepath.FromSlash(fmt.Sprintf("%s/db", DataDir))
+
 	// LogsDir is the global logs directory definition.
 	LogsDir = filepath.FromSlash(fmt.Sprintf("%s/logs", DataDir))
 )
