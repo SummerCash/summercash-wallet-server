@@ -3,8 +3,28 @@ package crypto
 import (
 	"encoding/hex"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"golang.org/x/crypto/sha3"
 )
+
+// Salt - hash and salt specified byte array
+func Salt(b []byte) []byte {
+	hash, _ := bcrypt.GenerateFromPassword(b, bcrypt.MinCost) // Hash
+
+	return hash // Return hash
+}
+
+// VerifySalted - verify the contents of a salted hash
+func VerifySalted(salted []byte, sha3 []byte) bool {
+	err := bcrypt.CompareHashAndPassword(salted, sha3) // Verify
+
+	if err != nil { // Check for errors
+		return false // Invalid
+	}
+
+	return true // Valid
+}
 
 // Sha3 - hash specified byte array
 func Sha3(b []byte) []byte {
