@@ -3,6 +3,7 @@
 package accounts
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"time"
@@ -13,6 +14,11 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/juju/loggo"
+)
+
+var (
+	// ErrAccountAlreadyExists is an error definition describing an attempted duplicate put.
+	ErrAccountAlreadyExists = errors.New("account already exists")
 )
 
 var (
@@ -67,6 +73,10 @@ func (db *DB) CreateNewAccount(name string, passwordHash []byte) (string, error)
 
 		if err != nil { // Check for errors
 			return err // Return found error
+		}
+
+		if alreadyExists := accountsBucket.Get(crypto.Sha3([]byte(name))); alreadyExists != nil { // Check already exists
+			return ErrAccountAlreadyExists // Return error
 		}
 
 		return accountsBucket.Put(crypto.Sha3([]byte(name)), accountInstance.Bytes()) // Put account
