@@ -15,6 +15,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 
 	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount)         // Set NewAccount post
 	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword) // Set ResetAccountPassword put
+	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)        // Set QueryAccount get
 
 	return nil // No error occurred, return nil
 }
@@ -51,6 +52,19 @@ func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, updatedAccount.String()) // Respond with account string
+}
+
+// QueryAccount handles a QueryAccount request.
+func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
+	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Query account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling QueryAccount request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	fmt.Fprintf(ctx, account.String()) // Respond with account string
 }
 
 /* END EXPORTED METHODS */
