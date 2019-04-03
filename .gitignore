@@ -19,3 +19,6 @@ common/test/
 
 # Private Keys
 *.pem
+
+# Node Data
+data/
