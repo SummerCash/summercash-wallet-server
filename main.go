@@ -6,7 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -32,11 +34,16 @@ var (
 	logger = loggo.GetLogger("") // Get logger
 
 	logFile *os.File // Log file
+
+	ctx, cancel = context.WithCancel(context.Background()) // Get context
 )
 
 // main is the summercash-wallet-server entry point.
 func main() {
 	flag.Parse() // Parse flags
+
+	defer cancel()        // Cancel
+	defer logFile.Close() // Close log file
 
 	err := configureLogger() // Configure logger
 
@@ -95,10 +102,6 @@ func startSummercashRPCServer() error {
 
 // startNode starts a new go-summercash node.
 func startNode() error {
-	ctx, cancel := context.WithCancel(context.Background()) // Get node context
-
-	defer cancel() // Cancel
-
 	host, err := p2p.NewHost(ctx, *nodePortFlag) // Initialize libp2p host with context and nat manager
 
 	if err != nil { // Check for errors
@@ -151,6 +154,26 @@ func startServingStandardHTTPJSONAPI() error {
 	if err != nil { // Check for errors
 		return err // Return found error
 	}
+
+	c := make(chan os.Signal) // Get control c
+
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM) // Notify
+
+	go func() {
+		<-c // Wait for ^c
+
+		err = db.DB.Close() // Close dag
+
+		if err != nil { // Check for errors
+			logger.Criticalf("db close errored: %s", err.Error()) // Return found error
+		}
+
+		logFile.Close() // Close log file
+
+		cancel() // Cancel
+
+		os.Exit(0) // Exit
+	}()
 
 	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf(":%d/api", *apiPortFlag), "", db) // Initialize API instance
 

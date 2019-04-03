@@ -59,6 +59,11 @@ func OpenDB() (*DB, error) {
 	}, nil // Return initialized db
 }
 
+// CloseDB closes the db.
+func (db *DB) CloseDB() error {
+	return db.DB.Close() // Close db
+}
+
 // CreateNewAccount creates a new account with a given name and password.
 // Returns the new account's address and an error (if applicable).
 func (db *DB) CreateNewAccount(name string, password string) (*Account, error) {

@@ -70,7 +70,7 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
-	err = fasthttp.ListenAndServe(strings.Split(api.BaseURI, "/api")[0], api.Router.Handler) // Start serving
+	err = fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
 
 	if err != nil { // Check for errors
 		return err // Return found error
