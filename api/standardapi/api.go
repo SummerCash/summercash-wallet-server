@@ -1,4 +1,4 @@
-// Package api defines the summercash-wallet-server API.
+// Package standardapi defines the summercash-wallet-server API.
 package standardapi
 
 import (
