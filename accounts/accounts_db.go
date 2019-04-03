@@ -12,6 +12,8 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/SummerCash/summercash-wallet-server/crypto"
 
+	summercashCommon "github.com/SummerCash/go-summercash/common"
+
 	"github.com/boltdb/bolt"
 	"github.com/juju/loggo"
 )
@@ -62,6 +64,43 @@ func OpenDB() (*DB, error) {
 // CloseDB closes the db.
 func (db *DB) CloseDB() error {
 	return db.DB.Close() // Close db
+}
+
+// AddNewAccount adds a new account to the list of accounts in the working database.
+func (db *DB) AddNewAccount(name string, password string, address string) (*Account, error) {
+	parsedAddress, err := summercashCommon.StringToAddress(address) // Parse hex address
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	account := &Account{
+		Name:         name,                          // Set name
+		PasswordHash: crypto.Salt([]byte(password)), // Set password hash
+		Address:      parsedAddress,                 // Set address
+	}
+
+	err = db.CreateAccountsBucketIfNotExist() // Create accounts bucket
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	err = db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
+
+		if alreadyExists := accountsBucket.Get(crypto.Sha3([]byte(name))); alreadyExists != nil { // Check already exists
+			return ErrAccountAlreadyExists // Return error
+		}
+
+		return accountsBucket.Put(crypto.Sha3([]byte(name)), account.Bytes()) // Put account
+	}) // Add new account to DB
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	return account, nil // Return address
 }
 
 // CreateNewAccount creates a new account with a given name and password.
