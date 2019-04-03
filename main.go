@@ -27,6 +27,7 @@ var (
 	nodeRPCPortFlag = flag.Int("node-rpc-port", 8080, "starts the go-summercash RPC server on a given port") // Init node rpc port flag
 	nodePortFlag    = flag.Int("node-port", 3000, "starts the go-summercash node on a given port")           // Init node port flag
 	networkFlag     = flag.String("network", "main_net", "starts the go-summercash node on a given network") // Init network flag
+	apiPortFlag     = flag.Int("api-port", 8000, "starts api on given port")                                 // Init API port flag
 
 	logger = loggo.GetLogger("") // Get logger
 
@@ -54,7 +55,15 @@ func main() {
 	if err != nil { // Check for errors
 		logger.Criticalf("main panicked: %s", err.Error()) // Log pending panic
 
-		panic(err) // Panic
+		os.Exit(1) // Return
+	}
+
+	err = startServingStandardHTTPJSONAPI() // Start serving
+
+	if err != nil { // Check for errors
+		logger.Criticalf("main panicked: %s", err.Error()) // Log pending panic
+
+		os.Exit(1) // Return
 	}
 }
 
@@ -143,7 +152,7 @@ func startServingStandardHTTPJSONAPI() error {
 		return err // Return found error
 	}
 
-	api := standardapi.NewJSONHTTPAPI("http://localhost:8000/api", "", db) // Initialize API instance
+	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf("%d/api", *apiPortFlag), "", db) // Initialize API instance
 
 	err = api.StartServing() // Start serving
 

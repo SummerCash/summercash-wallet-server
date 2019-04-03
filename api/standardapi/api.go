@@ -3,6 +3,7 @@ package standardapi
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"github.com/buaazp/fasthttprouter"
@@ -68,6 +69,8 @@ func (api *JSONHTTPAPI) StartServing() error {
 	if err != nil { // Check for errors
 		return err // Return found error
 	}
+
+	fasthttp.ListenAndServe(strings.Split(api.BaseURI, "/api")[0], api.Router.Handler) // Start serving
 
 	return nil // No error occurred, return nil
 }
