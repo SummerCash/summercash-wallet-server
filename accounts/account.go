@@ -18,6 +18,15 @@ type Account struct {
 	Address common.Address `json:"address"` // Address
 }
 
+// jsonAccount represents a JSON-friendly account.
+type jsonAccount struct {
+	Name string `json:"name"` // Name
+
+	PasswordHash []byte `json:"password_hash"` // Password hash
+
+	HexAddress string `json:"address"` // Address
+}
+
 /* BEGIN EXPORTED METHODS */
 
 // AccountFromBytes deserializes an account from a given byte array.
@@ -35,7 +44,13 @@ func AccountFromBytes(b []byte) (*Account, error) {
 
 // String serializes a given account to a JSON string.
 func (account *Account) String() string {
-	marshaledVal, _ := json.MarshalIndent(*account, "", "  ") // Marshal
+	jsonAccount := jsonAccount{
+		Name:         account.Name,             // Set name
+		PasswordHash: account.PasswordHash,     // Set password hash
+		HexAddress:   account.Address.String(), // Set hex address
+	} // Initialize JSON account instance
+
+	marshaledVal, _ := json.MarshalIndent(jsonAccount, "", "  ") // Marshal
 
 	return string(marshaledVal) // Return marshaled val
 }
