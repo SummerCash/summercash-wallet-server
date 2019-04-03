@@ -70,7 +70,11 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
-	fasthttp.ListenAndServe(strings.Split(api.BaseURI, "/api")[0], api.Router.Handler) // Start serving
+	err = fasthttp.ListenAndServe(strings.Split(api.BaseURI, "/api")[0], api.Router.Handler) // Start serving
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
 
 	return nil // No error occurred, return nil
 }

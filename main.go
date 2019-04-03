@@ -152,7 +152,7 @@ func startServingStandardHTTPJSONAPI() error {
 		return err // Return found error
 	}
 
-	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf("%d/api", *apiPortFlag), "", db) // Initialize API instance
+	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf(":%d/api", *apiPortFlag), "", db) // Initialize API instance
 
 	err = api.StartServing() // Start serving
 
