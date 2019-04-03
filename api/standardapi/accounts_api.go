@@ -11,7 +11,7 @@ import (
 
 // SetupAccountRoutes sets up all account api-related routes.
 func (api *JSONHTTPAPI) SetupAccountRoutes() error {
-	accountsAPIRoot := "/accounts" // Get accounts API root path
+	accountsAPIRoot := "/api/accounts" // Get accounts API root path
 
 	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount) // Set NewAccount post
 
