@@ -9,6 +9,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/api/standardapi"
+
 	"github.com/SummerCash/summercash-wallet-server/common"
 
 	"github.com/juju/loggo"
@@ -128,6 +131,25 @@ func startNode() error {
 	}
 
 	go client.StartIntermittentSync(60 * time.Second) // Start intermittent sync
+
+	return nil // No error occurred, return nil
+}
+
+// startServingStandardHTTPJSONAPI starts serving the standard HTTP JSON API.
+func startServingStandardHTTPJSONAPI() error {
+	db, err := accounts.OpenDB() // Open db
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	api := standardapi.NewJSONHTTPAPI("http://localhost:8000/api", "", db) // Initialize API instance
+
+	err = api.StartServing() // Start serving
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
 
 	return nil // No error occurred, return nil
 }

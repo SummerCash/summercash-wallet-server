@@ -25,7 +25,7 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	if err != nil { // Check for errors
 		logger.Errorf("errored while handling NewAccount request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
 
-		return // Return
+		panic(err) // Panic
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with account string

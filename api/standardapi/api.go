@@ -61,7 +61,13 @@ func (api *JSONHTTPAPI) GetResponseType() string {
 func (api *JSONHTTPAPI) StartServing() error {
 	api.Router = fasthttprouter.New() // Initialize router
 
-	api.Router.PanicHandler = api.HandlePanic
+	api.Router.PanicHandler = api.HandlePanic // Set panic handler
+
+	err := api.SetupAccountRoutes() // Start serving accounts API
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
 
 	return nil // No error occurred, return nil
 }
