@@ -79,12 +79,14 @@ func (db *DB) CreateNewAccount(name string, password string) (*Account, error) {
 		Address:      account.Address,               // Set address
 	}
 
-	err = db.DB.Update(func(tx *bolt.Tx) error {
-		accountsBucket, err := tx.CreateBucketIfNotExists(accountsBucket) // Create accounts bucket
+	err = db.CreateAccountsBucketIfNotExist() // Create accounts bucket
 
-		if err != nil { // Check for errors
-			return err // Return found error
-		}
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	err = db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
 
 		if alreadyExists := accountsBucket.Get(crypto.Sha3([]byte(name))); alreadyExists != nil { // Check already exists
 			return ErrAccountAlreadyExists // Return error
@@ -116,12 +118,14 @@ func (db *DB) ResetAccountPassword(name string, oldPassword string, newPassword 
 
 	(*account).PasswordHash = crypto.Salt([]byte(newPassword)) // Set salt
 
-	return db.DB.Update(func(tx *bolt.Tx) error {
-		accountsBucket, err := tx.CreateBucketIfNotExists(accountsBucket) // Create accounts bucket
+	err = db.CreateAccountsBucketIfNotExist() // Create accounts bucket
 
-		if err != nil { // Check for errors
-			return err // Return found error
-		}
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	return db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
 
 		return accountsBucket.Put(crypto.Sha3([]byte(name)), account.Bytes()) // Put account
 	}) // Update account info
@@ -131,12 +135,14 @@ func (db *DB) ResetAccountPassword(name string, oldPassword string, newPassword 
 func (db *DB) QueryAccountByUsername(name string) (*Account, error) {
 	var accountBuffer *Account // Initialize account buffer
 
-	err := db.DB.View(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(accountsBucket) // Get account bucket
+	err := db.CreateAccountsBucketIfNotExist() // Create accounts bucket
 
-		if err != nil { // Check for errors
-			return err // Return found error
-		}
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	err = db.DB.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(accountsBucket) // Get accounts bucket
 
 		accountBytes := bucket.Get(crypto.Sha3([]byte(name))) // Get account at hash
 
@@ -154,6 +160,15 @@ func (db *DB) QueryAccountByUsername(name string) (*Account, error) {
 	}
 
 	return accountBuffer, nil // Return read account
+}
+
+// CreateAccountsBucketIfNotExist creates the accounts bucket if it doesn't already exist.
+func (db *DB) CreateAccountsBucketIfNotExist() error {
+	return db.DB.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists(accountsBucket) // Create bucket
+
+		return err // Return error
+	}) // Create bucket
 }
 
 /* END EXPORTED METHODS */
