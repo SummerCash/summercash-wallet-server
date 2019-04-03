@@ -20,7 +20,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 
 // NewAccount handles a NewAccount request.
 func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
-	publicKey, err := api.AccountsDatabase.CreateNewAccount(ctx.UserValue("username").(string), string(ctx.FormValue("password"))) // Create new account
+	account, err := api.AccountsDatabase.CreateNewAccount(ctx.UserValue("username").(string), string(ctx.FormValue("password"))) // Create new account
 
 	if err != nil { // Check for errors
 		logger.Errorf("errored while handling NewAccount request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
@@ -28,7 +28,7 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 		return // Return
 	}
 
-	fmt.Fprintf(ctx)
+	fmt.Fprintf(ctx, account.String()) // Respond with account string
 }
 
 /* END EXPORTED METHODS */

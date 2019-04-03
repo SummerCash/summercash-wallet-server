@@ -2,9 +2,12 @@
 package standardapi
 
 import (
+	"fmt"
+
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"github.com/buaazp/fasthttprouter"
 	"github.com/juju/loggo"
+	"github.com/valyala/fasthttp"
 )
 
 var (
@@ -58,7 +61,14 @@ func (api *JSONHTTPAPI) GetResponseType() string {
 func (api *JSONHTTPAPI) StartServing() error {
 	api.Router = fasthttprouter.New() // Initialize router
 
+	api.Router.PanicHandler = api.HandlePanic
+
 	return nil // No error occurred, return nil
+}
+
+// HandlePanic handles a panic.
+func (api *JSONHTTPAPI) HandlePanic(ctx *fasthttp.RequestCtx, panic interface{}) {
+	fmt.Fprintf(ctx, panic.(error).Error()) // Log error
 }
 
 /* END EXPORTED METHODS */
