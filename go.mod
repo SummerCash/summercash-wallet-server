@@ -11,6 +11,6 @@ require (
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/juju/loggo v0.0.0-20190212223446-d976af380377
 	github.com/polaris-project/go-polaris v0.1.0
-	github.com/valyala/fasthttp v1.2.0 // indirect
+	github.com/valyala/fasthttp v1.2.0
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 )
