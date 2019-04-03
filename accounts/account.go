@@ -33,6 +33,13 @@ func AccountFromBytes(b []byte) (*Account, error) {
 	return &account, nil // No error occurred, return read value
 }
 
+// String serializes a given account to a JSON string.
+func (account *Account) String() string {
+	marshaledVal, _ := json.MarshalIndent(*account, "", "  ") // Marshal
+
+	return string(marshaledVal) // Return marshaled val
+}
+
 // Bytes serializes a given account to a byte array.
 func (account *Account) Bytes() []byte {
 	marshaledVal, _ := json.MarshalIndent(*account, "", "  ") // Marshal

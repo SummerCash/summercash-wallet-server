@@ -61,11 +61,11 @@ func OpenDB() (*DB, error) {
 
 // CreateNewAccount creates a new account with a given name and password.
 // Returns the new account's address and an error (if applicable).
-func (db *DB) CreateNewAccount(name string, password string) (string, error) {
+func (db *DB) CreateNewAccount(name string, password string) (*Account, error) {
 	account, err := accounts.NewAccount() // Create new account
 
 	if err != nil { // Check for errors
-		return "", err // Return found error
+		return &Account{}, err // Return found error
 	}
 
 	accountInstance := &Account{
@@ -89,10 +89,10 @@ func (db *DB) CreateNewAccount(name string, password string) (string, error) {
 	}) // Add new account to DB
 
 	if err != nil { // Check for errors
-		return "", err // Return found error
+		return &Account{}, err // Return found error
 	}
 
-	return account.Address.String(), nil // Return address
+	return accountInstance, nil // Return address
 }
 
 // ResetAccountPassword resets an accounts password.
