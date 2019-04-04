@@ -112,6 +112,12 @@ func (db *DB) CreateNewAccount(name string, password string) (*Account, error) {
 		return &Account{}, err // Return found error
 	}
 
+	err = account.WriteToMemory() // Write account to persistent memory
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
 	accountInstance := &Account{
 		Name:         name,                          // Set name
 		PasswordHash: crypto.Salt([]byte(password)), // Set password hash
