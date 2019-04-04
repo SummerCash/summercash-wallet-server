@@ -2,8 +2,8 @@
 package standardapi
 
 import (
-	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/SummerCash/summercash-wallet-server/transactions"
@@ -34,17 +34,7 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	var amountJSONVal *json.Number // Init amount JSON buffer
-
-	err = json.Unmarshal(common.GetCtxValue(ctx, "amount"), amountJSONVal) // Unmarshal
-
-	if err != nil { // Check for errors
-		logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
-
-		panic(err) // Panic
-	}
-
-	amount, err := amountJSONVal.Float64() // Get f64 val
+	amount, err := strconv.ParseFloat(string(common.GetCtxValue(ctx, "amount")), 64) // Parse amount
 
 	if err != nil { // Check for errors
 		logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
