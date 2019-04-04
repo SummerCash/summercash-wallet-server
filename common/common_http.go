@@ -2,6 +2,7 @@
 package common
 
 import (
+	"bytes"
 	"encoding/json"
 
 	"github.com/valyala/fasthttp"
@@ -20,9 +21,11 @@ func GetCtxValue(ctx *fasthttp.RequestCtx, key string) []byte {
 	} else if userValue := ctx.UserValue(key); userValue != nil { // Check has user value
 		return []byte(userValue.(string)) // Return user value
 	} else if jsonValue := jsonMap[key]; jsonValue != nil { // Check has JSON value
-		bytes, _ := jsonValue.MarshalJSON() // Marshal
+		bytesVal, _ := jsonValue.MarshalJSON() // Marshal
 
-		return bytes // Return JSON value
+		bytesVal = bytes.Replace(bytesVal, []byte(`"`), []byte{}, 2) // Get rid of JSON quotes
+
+		return bytesVal // Return JSON value
 	}
 
 	return nil // No value
