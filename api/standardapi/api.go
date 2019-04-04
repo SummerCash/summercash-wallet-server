@@ -70,6 +70,12 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
+	err = api.SetupTransactionsRoutes() // Start serving transactions API
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
 	err = fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
 
 	if err != nil { // Check for errors
