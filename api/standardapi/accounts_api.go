@@ -4,6 +4,8 @@ package standardapi
 import (
 	"fmt"
 
+	"github.com/SummerCash/summercash-wallet-server/common"
+
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 
 	"github.com/valyala/fasthttp"
@@ -27,10 +29,10 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	var account *accounts.Account // Initialize account buffer
 	var err error                 // Initialize error buffer
 
-	if ctx.FormValue("address") != nil { // Check address specified
-		account, err = api.AccountsDatabase.AddNewAccount(ctx.UserValue("username").(string), string(ctx.FormValue("password")), string(ctx.FormValue("address"))) // Add user
+	if address := common.GetCtxValue(ctx, "address"); address != nil { // Check address specified
+		account, err = api.AccountsDatabase.AddNewAccount(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password")), string(address)) // Add user
 	} else {
-		account, err = api.AccountsDatabase.CreateNewAccount(ctx.UserValue("username").(string), string(ctx.FormValue("password"))) // Create new account
+		account, err = api.AccountsDatabase.CreateNewAccount(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) // Create new account
 	}
 
 	if err != nil { // Check for errors
@@ -44,7 +46,7 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 
 // RestAccountPassword handles a ResetAccountPassword request.
 func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
-	err := api.AccountsDatabase.ResetAccountPassword(ctx.UserValue("username").(string), string(ctx.FormValue("old_password")), string(ctx.FormValue("new_password"))) // Reset password
+	err := api.AccountsDatabase.ResetAccountPassword(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "old_password")), string(common.GetCtxValue(ctx, "new_password"))) // Reset password
 
 	if err != nil { // Check for errors
 		logger.Errorf("errored while handling RestAccountPassword request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
