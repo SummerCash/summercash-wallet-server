@@ -32,11 +32,15 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 
 	var parentTransaction *types.Transaction // Init parent tx buffer
 
+	targetNonce := uint64(0.0) // Init target nonce
+
 	if len(accountChain.Transactions) > 0 { // Check has txs
 		parentTransaction = accountChain.Transactions[len(accountChain.Transactions)-1] // Set parent transaction
+
+		targetNonce = accountChain.CalculateTargetNonce() // Set nonce
 	}
 
-	transaction, err := types.NewTransaction(accountChain.CalculateTargetNonce(), parentTransaction, &account.Address, recipientAddress, amount, payload) // Initialize transaction
+	transaction, err := types.NewTransaction(targetNonce, parentTransaction, &account.Address, recipientAddress, amount, payload) // Initialize transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
