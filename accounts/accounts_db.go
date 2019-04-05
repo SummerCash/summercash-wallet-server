@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/SummerCash/go-summercash/accounts"
+	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/SummerCash/summercash-wallet-server/crypto"
 
@@ -101,6 +102,23 @@ func (db *DB) AddNewAccount(name string, password string, address string) (*Acco
 	}
 
 	return account, nil // Return address
+}
+
+// GetUserTransactions fetches the list of transactions for a particular account.
+func (db *DB) GetUserTransactions(username string) ([]*types.Transaction, error) {
+	account, err := db.QueryAccountByUsername(username) // Query account
+
+	if err != nil { // Check for errors
+		return []*types.Transaction{}, err // Return found error
+	}
+
+	chain, err := types.ReadChainFromMemory(account.Address) // Read account
+
+	if err != nil { // Check for errors
+		return []*types.Transaction{}, err // Return found error
+	}
+
+	return chain.Transactions, nil // Return account chain transactions
 }
 
 // CreateNewAccount creates a new account with a given name and password.
