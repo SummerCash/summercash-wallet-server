@@ -71,7 +71,7 @@ func (api *JSONHTTPAPI) StartServing() error {
 	if api.ContentDir != "" { // Check should serve content
 		api.ContentDir, _ = filepath.Abs(api.ContentDir) // Get absolute path
 
-		api.Router.ServeFiles("/*filepath", api.ContentDir) // Serve files
+		api.Router.ServeFiles("/app/*filepath", api.ContentDir) // Serve files
 	}
 
 	api.Router.PanicHandler = api.HandlePanic // Set panic handler
