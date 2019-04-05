@@ -29,7 +29,7 @@ var (
 	nodeRPCPortFlag = flag.Int("node-rpc-port", 8080, "starts the go-summercash RPC server on a given port") // Init node rpc port flag
 	nodePortFlag    = flag.Int("node-port", 3000, "starts the go-summercash node on a given port")           // Init node port flag
 	networkFlag     = flag.String("network", "main_net", "starts the go-summercash node on a given network") // Init network flag
-	apiPortFlag     = flag.Int("api-port", 8000, "starts api on given port")                                 // Init API port flag
+	apiPortFlag     = flag.Int("api-port", 443, "starts api on given port")                                  // Init API port flag
 
 	logger = loggo.GetLogger("") // Get logger
 
