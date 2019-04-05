@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/common"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -12,8 +13,14 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+// calcBalanceResponse represents a response to a CalcBalance request.
 type calcBalanceResponse struct {
 	Balance float64 `json:"balance"` // Account balance
+}
+
+// getUserTransactionsResponse represents a response to a GetUserTransactions request.
+type getUserTransactionsResponse struct {
+	Transactions []*types.Transaction `json:"transactions"` // Account transactions
 }
 
 /* BEGIN EXPORTED METHODS */
@@ -26,6 +33,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword)             // Set ResetAccountPassword put
 	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                    // Set QueryAccount get
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance) // Set CalculateAccountBalance get
+	api.Router.GET(fmt.Sprintf("%s/:user/transactions", accountsAPIRoot), api.GetUserTransactions)    // Set GetUserTransactions get
 
 	return nil // No error occurred, return nil
 }
@@ -101,15 +109,39 @@ func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 	fmt.Fprintf(ctx, balanceResponse.string()) // Respond with balance response instance
 }
 
+// GetUserTransactions handles a GetUserTransactions request.
+func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
+	userTransactions, err := api.AccountsDatabase.GetUserTransactions(ctx.UserValue("username").(string)) // Get user transactions
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling GetUserTransactions request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // panic
+	}
+
+	getUserTransactionsResponse := &getUserTransactionsResponse{
+		Transactions: userTransactions, // Set user transactions
+	} // Initialize user txs response
+
+	fmt.Fprintf(ctx, getUserTransactionsResponse.string()) // Response with user transactions response instance
+}
+
 /* END EXPORTED METHODS */
 
 /* BEGIN INTERNAL METHODS */
 
 // string marshals a calcBalanceResponse into a JSON-formatted string.
 func (response *calcBalanceResponse) string() string {
-	marshaledVal, _ := json.MarshalIndent(*response, "", "  ") // marshaleVal
+	marshaledVal, _ := json.MarshalIndent(*response, "", "  ") // Marshal value
 
 	return string(marshaledVal) // Return value
+}
+
+// string marshals a getUserTransactionsResponse into a JSON-formatted string.
+func (response *getUserTransactionsResponse) string() string {
+	marshaledval, _ := json.MarshalIndent(*response, "", "  ") // Marshal value
+
+	return string(marshaledval) // Return value
 }
 
 /* END INTERNAL METHODS */
