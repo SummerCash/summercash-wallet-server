@@ -16,6 +16,23 @@ import (
 
 /* BEGIN EXPORTED METHODS */
 
+// GetUserTransactions fetches the list of transactions for a particular account.
+func GetUserTransactions(accountsDB *accounts.DB, username string) ([]*types.Transaction, error) {
+	account, err := accountsDB.QueryAccountByUsername(username) // Query account
+
+	if err != nil { // Check for errors
+		return []*types.Transaction{}, err // Return found error
+	}
+
+	chain, err := types.ReadChainFromMemory(account.Address) // Read account
+
+	if err != nil { // Check for errors
+		return []*types.Transaction{}, err // Return found error
+	}
+
+	return chain.Transactions, nil // Return account chain transactions
+}
+
 // NewTransaction creates, signs, and publishes a new transaction from a given user to a given address.
 func NewTransaction(accountsDB *accounts.DB, username string, password string, recipientAddress *common.Address, amount float64, payload []byte) (*types.Transaction, error) {
 	account, err := accountsDB.QueryAccountByUsername(username) // Query account
