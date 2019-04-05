@@ -104,6 +104,23 @@ func (db *DB) AddNewAccount(name string, password string, address string) (*Acco
 	return account, nil // Return address
 }
 
+// GetUserBalance calculates the balance of a particular account.
+func (db *DB) GetUserBalance(username string) (float64, error) {
+	account, err := db.QueryAccountByUsername(username) // Query account
+
+	if err != nil { // Check for errors
+		return 0.0, err // Return found error
+	}
+
+	chain, err := types.ReadChainFromMemory(account.Address) // Read account
+
+	if err != nil { // Check for errors
+		return 0.0, err // Return found error
+	}
+
+	return chain.CalculateBalance(), nil // Return calculated balance
+}
+
 // GetUserTransactions fetches the list of transactions for a particular account.
 func (db *DB) GetUserTransactions(username string) ([]*types.Transaction, error) {
 	account, err := db.QueryAccountByUsername(username) // Query account
