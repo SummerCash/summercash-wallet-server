@@ -24,7 +24,7 @@ go run main.go
 
 ### Serving Content
 
-To serve static HTML content with summercash-wallet-server, simply copy all necessary content into a content/ folder in the summercash-wallet-server root (or specify via the --content-dir flag).
+To serve static content with summercash-wallet-server, simply copy all necessary content into a content/ folder in the summercash-wallet-server root (or specify via the --content-dir flag).
 
 ## APIs
 
