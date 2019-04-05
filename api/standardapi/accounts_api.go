@@ -29,11 +29,11 @@ type getUserTransactionsResponse struct {
 func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	accountsAPIRoot := "/api/accounts" // Get accounts API root path
 
-	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount)                     // Set NewAccount post
-	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword)             // Set ResetAccountPassword put
-	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                    // Set QueryAccount get
-	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance) // Set CalculateAccountBalance get
-	api.Router.GET(fmt.Sprintf("%s/:user/transactions", accountsAPIRoot), api.GetUserTransactions)    // Set GetUserTransactions get
+	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount)                      // Set NewAccount post
+	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword)              // Set ResetAccountPassword put
+	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                     // Set QueryAccount get
+	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
+	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
 
 	return nil // No error occurred, return nil
 }
