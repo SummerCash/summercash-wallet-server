@@ -3,6 +3,7 @@ package standardapi
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -25,16 +26,19 @@ type JSONHTTPAPI struct {
 	Router *fasthttprouter.Router `json:"-"` // Router
 
 	AccountsDatabase *accounts.DB `json:"-"` // Accounts database
+
+	ContentDir string `json:"content_dir"` // Static content directory
 }
 
 /* BEGIN EXPORTED METHODS */
 
 // NewJSONHTTPAPI initializes a new JSONHTTPAPI instance.
-func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB) *JSONHTTPAPI {
+func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, contentDir string) *JSONHTTPAPI {
 	return &JSONHTTPAPI{
 		BaseURI:          baseURI,    // Set base URI
 		Provider:         provider,   // Set provider
 		AccountsDatabase: accountsDB, // Set accounts DB
+		ContentDir:       contentDir, // Set content dir
 	}
 }
 
@@ -62,9 +66,17 @@ func (api *JSONHTTPAPI) GetResponseType() string {
 func (api *JSONHTTPAPI) StartServing() error {
 	api.Router = fasthttprouter.New() // Initialize router
 
+	var err error // Init error buffer
+
+	if api.ContentDir != "" { // Check should serve content
+		api.ContentDir, _ = filepath.Abs(api.ContentDir) // Get absolute path
+
+		api.Router.ServeFiles("/*filepath", api.ContentDir) // Serve files
+	}
+
 	api.Router.PanicHandler = api.HandlePanic // Set panic handler
 
-	err := api.SetupAccountRoutes() // Start serving accounts API
+	err = api.SetupAccountRoutes() // Start serving accounts API
 
 	if err != nil { // Check for errors
 		return err // Return found error
