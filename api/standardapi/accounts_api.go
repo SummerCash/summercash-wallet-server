@@ -3,6 +3,7 @@ package standardapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/SummerCash/go-summercash/types"
@@ -146,11 +147,21 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
 
-	authenticateUserResponse := &authenticateUserResponse{
-		Authenticated: api.AccountsDatabase.Auth(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))), // Set authenticated
+	if !api.AccountsDatabase.Auth(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) { // Check cannot authenticate
+		logger.Errorf("errored while handling AuthenticateUser request with username %s", ctx.UserValue("username")) // Log error
+
+		panic(errors.New("invalid username or password")) // panic
 	}
 
-	fmt.Fprintf(ctx, authenticateUserResponse.string()) // Respond with user authenticate response instance
+	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Get account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling AuthenticateUser request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // panic
+	}
+
+	fmt.Fprintf(ctx, account.String()) // Respond with user details
 }
 
 /* END EXPORTED METHODS */
