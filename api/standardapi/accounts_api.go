@@ -39,7 +39,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                     // Set QueryAccount get
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
 	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
-	api.Router.POST(fmt.Sprintf("%s/authenticate", accountsAPIRoot), api.AuthenticateUser)             // Set AuthenticateUser post
+	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
 
 	return nil // No error occurred, return nil
 }
@@ -147,7 +147,7 @@ func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
 
 	authenticateUserResponse := &authenticateUserResponse{
-		Authenticated: api.AccountsDatabase.Auth(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password"))), // Set authenticated
+		Authenticated: api.AccountsDatabase.Auth(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))), // Set authenticated
 	}
 
 	fmt.Fprintf(ctx, authenticateUserResponse.string()) // Respond with user authenticate response instance
