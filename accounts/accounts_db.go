@@ -182,6 +182,17 @@ func (db *DB) CreateNewAccount(name string, password string) (*Account, error) {
 	return accountInstance, nil // Return address
 }
 
+// Auth checks that a given user can be authenticated.
+func (db *DB) Auth(name string, password string) bool {
+	account, err := db.QueryAccountByUsername(name) // Query by username
+
+	if err != nil { // Check for errors
+		return false // Return not valid
+	}
+
+	return crypto.VerifySalted(account.PasswordHash, password) // Verify salt
+}
+
 // ResetAccountPassword resets an accounts password.
 func (db *DB) ResetAccountPassword(name string, oldPassword string, newPassword string) error {
 	account, err := db.QueryAccountByUsername(name) // Query by username
