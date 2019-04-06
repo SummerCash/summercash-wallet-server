@@ -23,6 +23,11 @@ type getUserTransactionsResponse struct {
 	Transactions []*types.Transaction `json:"transactions"` // Account transactions
 }
 
+// authenticateUserResponse represents a response to an AuthenticateUser request.
+type authenticateUserResponse struct {
+	Authenticated bool `json:"authenticated"` // Authenticated
+}
+
 /* BEGIN EXPORTED METHODS */
 
 // SetupAccountRoutes sets up all account api-related routes.
@@ -34,6 +39,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                     // Set QueryAccount get
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
 	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
+	api.Router.POST(fmt.Sprintf("%s/authenticate", accountsAPIRoot), api.AuthenticateUser)             // Set AuthenticateUser post
 
 	return nil // No error occurred, return nil
 }
@@ -133,7 +139,18 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 		Transactions: userTransactions, // Set user transactions
 	} // Initialize user txs response
 
-	fmt.Fprintf(ctx, getUserTransactionsResponse.string()) // Response with user transactions response instance
+	fmt.Fprintf(ctx, getUserTransactionsResponse.string()) // Respond with user transactions response instance
+}
+
+// AuthenticateUser handles an AuthenticateUser request.
+func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
+	authenticateUserResponse := &authenticateUserResponse{
+		Authenticated: api.AccountsDatabase.Auth(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password"))), // Set authenticated
+	}
+
+	fmt.Fprintf(ctx, authenticateUserResponse.string()) // Respond with user authenticate response instance
 }
 
 /* END EXPORTED METHODS */
@@ -149,6 +166,13 @@ func (response *calcBalanceResponse) string() string {
 
 // string marshals a getUserTransactionsResponse into a JSON-formatted string.
 func (response *getUserTransactionsResponse) string() string {
+	marshaledval, _ := json.MarshalIndent(*response, "", "  ") // Marshal value
+
+	return string(marshaledval) // Return value
+}
+
+// string marshals an authenticateUserResponse into a JSON-formatted string.
+func (response *authenticateUserResponse) string() string {
 	marshaledval, _ := json.MarshalIndent(*response, "", "  ") // Marshal value
 
 	return string(marshaledval) // Return value
