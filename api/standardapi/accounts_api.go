@@ -40,6 +40,8 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 
 // NewAccount handles a NewAccount request.
 func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
 	var account *accounts.Account // Initialize account buffer
 	var err error                 // Initialize error buffer
 
@@ -60,6 +62,8 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 
 // RestAccountPassword handles a ResetAccountPassword request.
 func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
 	err := api.AccountsDatabase.ResetAccountPassword(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "old_password")), string(common.GetCtxValue(ctx, "new_password"))) // Reset password
 
 	if err != nil { // Check for errors
@@ -81,6 +85,8 @@ func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
 
 // QueryAccount handles a QueryAccount request.
 func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Query account
 
 	if err != nil { // Check for errors
@@ -94,6 +100,8 @@ func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 
 // CalculateAccountBalance handles a CalculateAccountBalance request.
 func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
 	balance, err := api.AccountsDatabase.GetUserBalance(ctx.UserValue("username").(string)) // Get balance
 
 	if err != nil { // Check for errors
@@ -111,6 +119,8 @@ func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 
 // GetUserTransactions handles a GetUserTransactions request.
 func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
 	userTransactions, err := api.AccountsDatabase.GetUserTransactions(ctx.UserValue("username").(string)) // Get user transactions
 
 	if err != nil { // Check for errors
