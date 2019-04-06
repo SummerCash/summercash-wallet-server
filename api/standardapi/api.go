@@ -2,6 +2,7 @@
 package standardapi
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -28,6 +29,11 @@ type JSONHTTPAPI struct {
 	AccountsDatabase *accounts.DB `json:"-"` // Accounts database
 
 	ContentDir string `json:"content_dir"` // Static content directory
+}
+
+// errorResponse represents a JSON error.
+type errorResponse struct {
+	Error string `json:"error"` // Error
 }
 
 /* BEGIN EXPORTED METHODS */
@@ -99,12 +105,23 @@ func (api *JSONHTTPAPI) StartServing() error {
 
 // HandlePanic handles a panic.
 func (api *JSONHTTPAPI) HandlePanic(ctx *fasthttp.RequestCtx, panic interface{}) {
-	fmt.Fprintf(ctx, panic.(error).Error()) // Log error
+	errorInstance := &errorResponse{
+		Error: panic.(error).Error(), // Set error
+	}
+
+	fmt.Fprintf(ctx, errorInstance.string()) // Log error
 }
 
 /* END EXPORTED METHODS */
 
 /* BEGIN INTERNAL METHODS */
+
+// string marshals an error response into a string.
+func (response *errorResponse) string() string {
+	marshaledVal, _ := json.MarshalIndent(*response, "", "  ") // marshal
+
+	return string(marshaledVal) // Return response
+}
 
 // getAPILogger gets the API package logger.
 func getAPILogger() loggo.Logger {
