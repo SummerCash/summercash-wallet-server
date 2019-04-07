@@ -42,14 +42,14 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		}
 
 		recipient = recipientAccount.Address // Set address
-	}
+	} else {
+		recipient, err = summercashCommon.StringToAddress(string(common.GetCtxValue(ctx, "recipient"))) // Parse recipient
 
-	recipient, err = summercashCommon.StringToAddress(string(common.GetCtxValue(ctx, "recipient"))) // Parse recipient
+		if err != nil { // Check for errors
+			logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
 
-	if err != nil { // Check for errors
-		logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
-
-		panic(err) // Panic
+			panic(err) // Panic
+		}
 	}
 
 	amount, err := strconv.ParseFloat(string(common.GetCtxValue(ctx, "amount")), 64) // Parse amount
