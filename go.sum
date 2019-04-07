@@ -8,6 +8,8 @@ github.com/SummerCash/go-summercash v0.5.6 h1:qwt/Cj9H1dqKuTF+lhkkPTI75RxtZ3tL5z
 github.com/SummerCash/go-summercash v0.5.6/go.mod h1:UbPAbKHczRMrrVAO6saiHAbe3cBEG1ooTFH2hlEosJ8=
 github.com/SummerCash/go-summercash v0.5.7 h1:iIVLatTgTwKPO49udJKlYKLv3DJSZWAmEb4B/XHIGPU=
 github.com/SummerCash/go-summercash v0.5.7/go.mod h1:UbPAbKHczRMrrVAO6saiHAbe3cBEG1ooTFH2hlEosJ8=
+github.com/SummerCash/go-summercash v0.5.8 h1:TaNOYei+bCngqNIC+PW7y0NzSGasNBRD6ArZeTlOMZY=
+github.com/SummerCash/go-summercash v0.5.8/go.mod h1:UbPAbKHczRMrrVAO6saiHAbe3cBEG1ooTFH2hlEosJ8=
 github.com/SummerCash/ursa v0.0.0-20190126175009-482347de5d23 h1:3YS2qzlcsaxlxh4CiCrRiqT6P4gmC+FRH87VyQ56QNg=
 github.com/SummerCash/ursa v0.0.0-20190126175009-482347de5d23/go.mod h1:LE6kv6YN5kn+swPaAlC3unPab9eyiET1CTgBFQAw1SY=
 github.com/SummerCash/wagon v0.4.0 h1:jxjRC3tDkbwi8loj7aAeGCa/DSBaTthkCSl69kQqGS4=
