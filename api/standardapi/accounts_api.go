@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/common"
@@ -140,19 +141,19 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 
 	for _, transaction := range userTransactions { // Iterate through user txs
 		stringTransaction := &types.StringTransaction{
-			AccountNonce:            transaction.AccountNonce,                               // Set account nonce
-			SenderHex:               transaction.Sender.String(),                            // Set sender hex
-			RecipientHex:            transaction.Recipient.String(),                         // Set recipient hex
-			Amount:                  transaction.Amount,                                     // Set amount
-			Payload:                 transaction.Payload,                                    // Set payload
-			Signature:               transaction.Signature,                                  // Set signature
-			ParentTx:                transaction.ParentTx,                                   // Set parent
-			Timestamp:               transaction.Timestamp.Format("01/02/2006 11:04:05 AM"), // Set timestamp
-			DeployedContractAddress: transaction.DeployedContractAddress,                    // Set deployed contract address
-			ContractCreation:        transaction.ContractCreation,                           // Set is contract creation
-			Genesis:                 transaction.Genesis,                                    // Set is genesis
-			Logs:                    transaction.Logs,                                       // Set logs
-			HashHex:                 transaction.Hash.String(),                              // Set hash hex
+			AccountNonce:            transaction.AccountNonce,                                                   // Set account nonce
+			SenderHex:               transaction.Sender.String(),                                                // Set sender hex
+			RecipientHex:            transaction.Recipient.String(),                                             // Set recipient hex
+			Amount:                  transaction.Amount,                                                         // Set amount
+			Payload:                 transaction.Payload,                                                        // Set payload
+			Signature:               transaction.Signature,                                                      // Set signature
+			ParentTx:                transaction.ParentTx,                                                       // Set parent
+			Timestamp:               transaction.Timestamp.Add(-4 * time.Hour).Format("01/02/2006 03:04:05 PM"), // Set timestamp
+			DeployedContractAddress: transaction.DeployedContractAddress,                                        // Set deployed contract address
+			ContractCreation:        transaction.ContractCreation,                                               // Set is contract creation
+			Genesis:                 transaction.Genesis,                                                        // Set is genesis
+			Logs:                    transaction.Logs,                                                           // Set logs
+			HashHex:                 transaction.Hash.String(),                                                  // Set hash hex
 		} // Init string transaction
 
 		stringTransactions = append(stringTransactions, stringTransaction) // Append string tx
