@@ -140,19 +140,19 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 
 	for _, transaction := range userTransactions { // Iterate through user txs
 		stringTransaction := &types.StringTransaction{
-			AccountNonce:            transaction.AccountNonce,            // Set account nonce
-			SenderHex:               transaction.Sender.String(),         // Set sender hex
-			RecipientHex:            transaction.Recipient.String(),      // Set recipient hex
-			Amount:                  transaction.Amount,                  // Set amount
-			Payload:                 transaction.Payload,                 // Set payload
-			Signature:               transaction.Signature,               // Set signature
-			ParentTx:                transaction.ParentTx,                // Set parent
-			Timestamp:               transaction.Timestamp,               // Set timestamp
-			DeployedContractAddress: transaction.DeployedContractAddress, // Set deployed contract address
-			ContractCreation:        transaction.ContractCreation,        // Set is contract creation
-			Genesis:                 transaction.Genesis,                 // Set is genesis
-			Logs:                    transaction.Logs,                    // Set logs
-			HashHex:                 transaction.Hash.String(),           // Set hash hex
+			AccountNonce:            transaction.AccountNonce,                         // Set account nonce
+			SenderHex:               transaction.Sender.String(),                      // Set sender hex
+			RecipientHex:            transaction.Recipient.String(),                   // Set recipient hex
+			Amount:                  transaction.Amount,                               // Set amount
+			Payload:                 transaction.Payload,                              // Set payload
+			Signature:               transaction.Signature,                            // Set signature
+			ParentTx:                transaction.ParentTx,                             // Set parent
+			Timestamp:               transaction.Timestamp.Format("8/8/1965 1:00 PM"), // Set timestamp
+			DeployedContractAddress: transaction.DeployedContractAddress,              // Set deployed contract address
+			ContractCreation:        transaction.ContractCreation,                     // Set is contract creation
+			Genesis:                 transaction.Genesis,                              // Set is genesis
+			Logs:                    transaction.Logs,                                 // Set logs
+			HashHex:                 transaction.Hash.String(),                        // Set hash hex
 		} // Init string transaction
 
 		stringTransactions = append(stringTransactions, stringTransaction) // Append string tx
