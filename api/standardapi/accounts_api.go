@@ -21,7 +21,7 @@ type calcBalanceResponse struct {
 
 // getUserTransactionsResponse represents a response to a GetUserTransactions request.
 type getUserTransactionsResponse struct {
-	Transactions []*types.Transaction `json:"transactions"` // Account transactions
+	Transactions []*types.StringTransaction `json:"transactions"` // Account transactions
 }
 
 // authenticateUserResponse represents a response to an AuthenticateUser request.
@@ -136,8 +136,30 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 		panic(err) // panic
 	}
 
+	var stringTransactions []*types.StringTransaction // Init string tx buffer
+
+	for _, transaction := range userTransactions { // Iterate through user txs
+		stringTransaction := &types.StringTransaction{
+			AccountNonce:            transaction.AccountNonce,            // Set account nonce
+			SenderHex:               transaction.Sender.String(),         // Set sender hex
+			RecipientHex:            transaction.Recipient.String(),      // Set recipient hex
+			Amount:                  transaction.Amount,                  // Set amount
+			Payload:                 transaction.Payload,                 // Set payload
+			Signature:               transaction.Signature,               // Set signature
+			ParentTx:                transaction.ParentTx,                // Set parent
+			Timestamp:               transaction.Timestamp,               // Set timestamp
+			DeployedContractAddress: transaction.DeployedContractAddress, // Set deployed contract address
+			ContractCreation:        transaction.ContractCreation,        // Set is contract creation
+			Genesis:                 transaction.Genesis,                 // Set is genesis
+			Logs:                    transaction.Logs,                    // Set logs
+			HashHex:                 transaction.Hash.String(),           // Set hash hex
+		} // Init string transaction
+
+		stringTransactions = append(stringTransactions, stringTransaction) // Append string tx
+	}
+
 	getUserTransactionsResponse := &getUserTransactionsResponse{
-		Transactions: userTransactions, // Set user transactions
+		Transactions: stringTransactions, // Set string transactions
 	} // Initialize user txs response
 
 	fmt.Fprintf(ctx, getUserTransactionsResponse.string()) // Respond with user transactions response instance
