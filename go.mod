@@ -3,7 +3,7 @@ module github.com/SummerCash/summercash-wallet-server
 go 1.12
 
 require (
-	github.com/SummerCash/go-summercash v0.5.8
+	github.com/SummerCash/go-summercash v0.5.92
 	github.com/boltdb/bolt v1.3.1
 	github.com/briandowns/spinner v0.0.0-20190319032542-ac46072a5a91 // indirect
 	github.com/buaazp/fasthttprouter v0.1.1
