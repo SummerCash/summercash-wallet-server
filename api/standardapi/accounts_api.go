@@ -119,7 +119,7 @@ func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 	}
 
 	balanceResponse := &calcBalanceResponse{
-		Balance: balance, // Set balance
+		Balance: balance.Float(), // Set balance
 	} // Initialize balance response
 
 	fmt.Fprintf(ctx, balanceResponse.string()) // Respond with balance response instance

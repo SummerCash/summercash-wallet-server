@@ -5,6 +5,7 @@ package accounts
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"path/filepath"
 	"time"
 
@@ -105,17 +106,17 @@ func (db *DB) AddNewAccount(name string, password string, address string) (*Acco
 }
 
 // GetUserBalance calculates the balance of a particular account.
-func (db *DB) GetUserBalance(username string) (float64, error) {
+func (db *DB) GetUserBalance(username string) (*big.Float, error) {
 	account, err := db.QueryAccountByUsername(username) // Query account
 
 	if err != nil { // Check for errors
-		return 0.0, err // Return found error
+		return big.NewFloat(0), err // Return found error
 	}
 
 	chain, err := types.ReadChainFromMemory(account.Address) // Read account
 
 	if err != nil { // Check for errors
-		return 0.0, err // Return found error
+		return big.NewFloat(0), err // Return found error
 	}
 
 	return chain.CalculateBalance(), nil // Return calculated balance

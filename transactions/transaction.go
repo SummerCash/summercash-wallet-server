@@ -3,6 +3,7 @@ package transactions
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
@@ -40,7 +41,7 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		targetNonce = accountChain.CalculateTargetNonce() // Set nonce
 	}
 
-	transaction, err := types.NewTransaction(targetNonce, parentTransaction, &account.Address, recipientAddress, amount, payload) // Initialize transaction
+	transaction, err := types.NewTransaction(targetNonce, parentTransaction, &account.Address, recipientAddress, big.NewFloat(amount), payload) // Initialize transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
