@@ -118,8 +118,10 @@ func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
+	floatVal, _ := balance.Float64() // Get float val
+
 	balanceResponse := &calcBalanceResponse{
-		Balance: balance.Float(), // Set balance
+		Balance: floatVal, // Set balance
 	} // Initialize balance response
 
 	fmt.Fprintf(ctx, balanceResponse.string()) // Respond with balance response instance
@@ -144,7 +146,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 			AccountNonce:            transaction.AccountNonce,                                                   // Set account nonce
 			SenderHex:               transaction.Sender.String(),                                                // Set sender hex
 			RecipientHex:            transaction.Recipient.String(),                                             // Set recipient hex
-			Amount:                  transaction.Amount,                                                         // Set amount
+			Amount:                  transaction.Amount.String(),                                                // Set amount
 			Payload:                 transaction.Payload,                                                        // Set payload
 			Signature:               transaction.Signature,                                                      // Set signature
 			ParentTx:                transaction.ParentTx,                                                       // Set parent
