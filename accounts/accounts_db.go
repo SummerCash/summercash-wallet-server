@@ -193,6 +193,25 @@ func (db *DB) Auth(name string, password string) bool {
 	return crypto.VerifySalted(account.PasswordHash, password) // Verify salt
 }
 
+// DeleteAccount deletes an account from the working DB.
+func (db *DB) DeleteAccount(name string, password string) error {
+	err := db.CreateAccountsBucketIfNotExist() // Create accounts bucket
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	if !db.Auth(name, password) { // Auth
+		return ErrPasswordInvalid // Return error
+	}
+
+	return db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
+
+		return accountsBucket.Delete(crypto.Sha3([]byte(name))) // Delete account
+	}) // Update account info
+}
+
 // ResetAccountPassword resets an accounts password.
 func (db *DB) ResetAccountPassword(name string, oldPassword string, newPassword string) error {
 	account, err := db.QueryAccountByUsername(name) // Query by username
