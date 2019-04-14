@@ -42,6 +42,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
 	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
+	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                    // Set DeleteUser delete
 
 	return nil // No error occurred, return nil
 }
@@ -187,6 +188,21 @@ func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with user details
+}
+
+// DeleteUser handles a DeleteUser request.
+func (api *JSONHTTPAPI) DeleteUser(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+
+	err := api.AccountsDatabase.DeleteAccount(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) // Delete account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling DeleteUser request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%smessage%s: %sAccount deleted successfully%s}", `"`, `"`, `"`, `"`)) // Respond with success
 }
 
 /* END EXPORTED METHODS */
