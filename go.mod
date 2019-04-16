@@ -33,8 +33,8 @@ require (
 	github.com/twitchtv/twirp v5.6.0+incompatible // indirect
 	github.com/valyala/fasthttp v1.2.0
 	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3 // indirect
-	golang.org/x/sys v0.0.0-20190412213103-97732733099d // indirect
+	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
+	golang.org/x/sys v0.0.0-20190415145633-3fd5a3612ccd // indirect
 	golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2 // indirect
 	golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
