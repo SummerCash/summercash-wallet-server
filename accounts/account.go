@@ -5,6 +5,8 @@ package accounts
 import (
 	"bytes"
 	"encoding/json"
+	"math/big"
+	"time"
 
 	"github.com/SummerCash/go-summercash/common"
 )
@@ -16,6 +18,9 @@ type Account struct {
 	PasswordHash []byte `json:"password_hash"` // Password hash
 
 	Address common.Address `json:"address"` // Address
+
+	LastFaucetClaimTime   time.Time  `json:"last_claim_time"`   // Last claim time
+	LastFaucetClaimAmount *big.Float `json:"last_claim_amount"` // Last claim amount
 }
 
 // jsonAccount represents a JSON-friendly account.

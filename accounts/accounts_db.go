@@ -105,6 +105,24 @@ func (db *DB) AddNewAccount(name string, password string, address string) (*Acco
 	return account, nil // Return address
 }
 
+// MakeFaucetClaim makes a faucet claim for a given account.
+func (db *DB) MakeFaucetClaim(account *Account, amount *big.Float) error {
+	err := db.CreateAccountsBucketIfNotExist() // Create accounts bucket
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	return db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
+
+		(*account).LastFaucetClaimTime = time.Now() // Set last claim time
+		(*account).LastFaucetClaimAmount = amount   // Set claim amount
+
+		return accountsBucket.Put(crypto.Sha3([]byte(account.Name)), account.Bytes()) // Put account
+	}) // Add new account to DB
+}
+
 // GetUserBalance calculates the balance of a particular account.
 func (db *DB) GetUserBalance(username string) (*big.Float, error) {
 	account, err := db.QueryAccountByUsername(username) // Query account
