@@ -11,7 +11,8 @@ type Ruleset interface {
 	MaximumClaim24hr() *big.Float  // Get max amount can claim in 24 hours.
 	MininmumClaim24hr() *big.Float // Get min amount can claim in 24 hours.
 
-	DepositPerClaim(claim *big.Float) // Get deposit required at claim amount.
+	DepositClaimCurve(curve float64) // Get amount to multiply possible claim by deposit by.
 
 	BannedUsers() []*accounts.Account // Get banned users.
+	BanUser(*accounts.Account)        // Ban user.
 }
