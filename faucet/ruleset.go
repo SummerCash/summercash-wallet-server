@@ -2,6 +2,7 @@
 package faucet
 
 import (
+	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"math/big"
 )
 
@@ -11,4 +12,6 @@ type Ruleset interface {
 	MininmumClaim24hr() *big.Float // Get min amount can claim in 24 hours.
 
 	DepositPerClaim(claim *big.Float) // Get deposit required at claim amount.
+
+	BannedUsers() []*accounts.Account // Get banned users.
 }
