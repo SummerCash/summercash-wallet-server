@@ -36,13 +36,14 @@ type authenticateUserResponse struct {
 // SetupAccountRoutes sets up all account api-related routes.
 func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	accountsAPIRoot := "/api/accounts" // Get accounts API root path
+	addressAPIRoot := "/api/addresses" // Get addresses API root path
 
 	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount)                      // Set NewAccount post
 	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword)              // Set ResetAccountPassword put
 	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                     // Set QueryAccount get
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
 	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
-	api.Router.GET(fmt.Sprintf("%s/resolve/:address", accountsAPIRoot), api.ResolveAddress)            // Set ResolveAddress get
+	api.Router.GET(fmt.Sprintf("%s/resolve/:address", addressAPIRoot), api.ResolveAddress)             // Set ResolveAddress get
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                    // Set DeleteUser delete
 
