@@ -310,7 +310,7 @@ func (db *DB) QueryAccountByAddress(address summercashCommon.Address) (*Account,
 		for _, accountBytes := c.First(); accountBytes != nil; _, accountBytes = c.Next() { // Iterate
 			account, err := AccountFromBytes(accountBytes) // Deserialize account bytes
 
-			if bytes.Equal(account.Address.Bytes(), address.Bytes()) && err != nil { // Check addresses equivalent
+			if bytes.Equal(account.Address.Bytes(), address.Bytes()) && err == nil { // Check addresses equivalent
 				accountBuffer = account // Set account
 
 				return nil // No error occurred, return nil
