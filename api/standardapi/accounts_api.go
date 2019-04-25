@@ -43,6 +43,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                     // Set QueryAccount get
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
 	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
+	api.Router.GET(fmt.Sprintf("%s/:username/lastHash", accountsAPIRoot), api.GetLastUserTxHash)       // Set GetLastUserTxHash get
 	api.Router.GET(fmt.Sprintf("%s/resolve/:address", addressAPIRoot), api.ResolveAddress)             // Set ResolveAddress get
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                    // Set DeleteUser delete
@@ -70,6 +71,35 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with account string
+}
+
+// GetLastUserTxHash handles a GetLastUserTxHash request.
+func (api *JSONHTTPAPI) GetLastUserTxHash(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+
+	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling GetLastUserTxHash request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	accountChain, err := types.ReadChainFromMemory(account.Address) // Read account chain
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling GetLastUserTxHash request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	if len(accountChain.Transactions) == 0 { // Check no transactions
+		fmt.Fprintf(ctx, fmt.Sprintf("{%shash%s: %s0x123456%s", `"`, `"`, `"`, `"`)) // Write temp response
+
+		return // Return
+	}
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%shash%s: %s%s%s", `"`, `"`, `"`, accountChain.Transactions[len(accountChain.Transactions)-1].Hash.String(), `"`)) // Write hash
 }
 
 // ResolveAddress handles a ResolveAddress request.
