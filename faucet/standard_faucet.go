@@ -2,7 +2,9 @@
 package faucet
 
 import (
+	"bytes"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"math/big"
 	"time"
 )
 
@@ -38,7 +40,7 @@ func (faucet *StandardFaucet) AccountCanClaim(account *accounts.Account) bool {
 
 	account = updatedAccount // Set to updated account reference
 
-	if account.LastFaucetClaimTime.Sub(time.Now()).Hours() < 24 { // Check less than 24 hours
+	if account.LastFaucetClaimTime.Sub(time.Now()).Hours() < 24 { // Check less than 24 hours since last claim
 		return false // Cannot claim
 	}
 
@@ -56,6 +58,22 @@ func (faucet *StandardFaucet) AccountLastClaim(account *accounts.Account) time.T
 	account = updatedAccount // Set to updated account reference
 
 	return account.LastFaucetClaimTime // Return last claim time
+}
+
+// AmountCanClaim gets the max amount an account can claim.
+// If the account has already claimed in the last 24 hours, zero is returned.
+func (faucet *StandardFaucet) AmountCanClaim(account *accounts.Account) *big.Float {
+	for _, user := range faucet.Ruleset.BannedUsers() { // Iterate through banned users
+		if bytes.Equal(user.Address.Bytes(), account.Address.Bytes()) { // Check is banned user
+			return big.NewFloat(0) // Return zero
+		}
+	}
+
+	if faucet.AccountLastClaim(account).Sub(time.Now()).Hours() < 24 { // Check less than 24 hours since last claim
+		return big.NewFloat(0) // Cannot claim
+	}
+
+	return faucet.Ruleset.MaximumClaim24hr() // Return max claim 24 hours
 }
 
 /* END EXPORTED METHODS */
