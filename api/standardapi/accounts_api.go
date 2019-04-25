@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
-	"github.com/SummerCash/summercash-wallet-server/common"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/common"
 
 	"github.com/valyala/fasthttp"
 )
@@ -41,6 +42,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/:username", accountsAPIRoot), api.QueryAccount)                     // Set QueryAccount get
 	api.Router.GET(fmt.Sprintf("%s/:username/balance", accountsAPIRoot), api.CalculateAccountBalance)  // Set CalculateAccountBalance get
 	api.Router.GET(fmt.Sprintf("%s/:username/transactions", accountsAPIRoot), api.GetUserTransactions) // Set GetUserTransactions get
+	api.Router.GET(fmt.Sprintf("%s/resolve/:address", accountsAPIRoot), api.ResolveAddress)            // Set ResolveAddress get
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                    // Set DeleteUser delete
 
@@ -67,6 +69,29 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with account string
+}
+
+// ResolveAddress handles a ResolveAddress request.
+func (api *JSONHTTPAPI) ResolveAddress(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+
+	address, err := summercashCommon.StringToAddress(string(common.GetCtxValue(ctx, "address"))) // Parse address
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling ResolveAddress request with address %s: %s", ctx.UserValue("address"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	account, err := api.AccountsDatabase.QueryAccountByAddress(address) // Query account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling ResolveAddress request with address %s: %s", ctx.UserValue("address"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	fmt.Fprintf(ctx, `{"username": "`+account.Name+`"}`) // Respond with account name
 }
 
 // RestAccountPassword handles a ResetAccountPassword request.

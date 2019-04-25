@@ -46,6 +46,8 @@ func (api *JSONHTTPAPI) Claim(ctx *fasthttp.RequestCtx) {
 
 		panic(err) // Panic
 	}
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%smessage%s: %sFaucet bounty claimed successfully%s}", `"`, `"`, `"`, `"`)) // Write response
 }
 
 /* END EXPORTED METHODS */
