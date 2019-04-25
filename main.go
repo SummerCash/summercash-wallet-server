@@ -5,6 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"math/big"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -15,6 +16,7 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/api/standardapi"
 
 	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/faucet"
 
 	"github.com/juju/loggo"
 	"github.com/juju/loggo/loggocolor"
@@ -26,11 +28,12 @@ import (
 )
 
 var (
-	nodeRPCPortFlag = flag.Int("node-rpc-port", 8080, "starts the go-summercash RPC server on a given port")      // Init node rpc port flag
-	nodePortFlag    = flag.Int("node-port", 3000, "starts the go-summercash node on a given port")                // Init node port flag
-	networkFlag     = flag.String("network", "main_net", "starts the go-summercash node on a given network")      // Init network flag
-	apiPortFlag     = flag.Int("api-port", 443, "starts api on given port")                                       // Init API port flag
-	contentDirFlag  = flag.String("content-dir", filepath.FromSlash("./app"), "serves a given content directory") // Init content dir flag
+	nodeRPCPortFlag  = flag.Int("node-rpc-port", 8080, "starts the go-summercash RPC server on a given port")      // Init node rpc port flag
+	nodePortFlag     = flag.Int("node-port", 3000, "starts the go-summercash node on a given port")                // Init node port flag
+	networkFlag      = flag.String("network", "main_net", "starts the go-summercash node on a given network")      // Init network flag
+	apiPortFlag      = flag.Int("api-port", 443, "starts api on given port")                                       // Init API port flag
+	contentDirFlag   = flag.String("content-dir", filepath.FromSlash("./app"), "serves a given content directory") // Init content dir flag
+	faucetRewardFlag = flag.Float64("faucet-reward", 0.01, "starts faucet api with a given reward amount")         // Init faucet reward flag
 
 	logger = loggo.GetLogger("") // Get logger
 
@@ -176,7 +179,13 @@ func startServingStandardHTTPJSONAPI() error {
 		os.Exit(0) // Exit
 	}()
 
-	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf(":%d/api", *apiPortFlag), "", db, *contentDirFlag) // Initialize API instance
+	ruleset := faucet.NewStandardRuleset(big.NewFloat(*faucetRewardFlag), []*accounts.Account{}) // Initialize ruleset
+
+	standardFaucet := faucet.NewStandardFaucet(ruleset, db) // Initialize faucet
+
+	abstractFaucet := faucet.Faucet(standardFaucet) // Get interface
+
+	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf(":%d/api", *apiPortFlag), "", db, &abstractFaucet, *contentDirFlag) // Initialize API instance
 
 	err = api.StartServing() // Start serving
 
