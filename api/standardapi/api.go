@@ -4,6 +4,7 @@ package standardapi
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/SummerCash/summercash-wallet-server/faucet"
 	"path/filepath"
 	"strings"
 
@@ -28,6 +29,8 @@ type JSONHTTPAPI struct {
 
 	AccountsDatabase *accounts.DB `json:"-"` // Accounts database
 
+	Faucet *faucet.Faucet `json:"-"` // Faucet
+
 	ContentDir string `json:"content_dir"` // Static content directory
 }
 
@@ -39,12 +42,13 @@ type errorResponse struct {
 /* BEGIN EXPORTED METHODS */
 
 // NewJSONHTTPAPI initializes a new JSONHTTPAPI instance.
-func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, contentDir string) *JSONHTTPAPI {
+func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string) *JSONHTTPAPI {
 	return &JSONHTTPAPI{
 		BaseURI:          baseURI,    // Set base URI
 		Provider:         provider,   // Set provider
 		AccountsDatabase: accountsDB, // Set accounts DB
 		ContentDir:       contentDir, // Set content dir
+		Faucet:           faucet,     // Set faucet
 	}
 }
 
@@ -89,6 +93,12 @@ func (api *JSONHTTPAPI) StartServing() error {
 	}
 
 	err = api.SetupTransactionsRoutes() // Start serving transactions API
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	err = api.SetupFaucetRoutes() // Start serving faucet API
 
 	if err != nil { // Check for errors
 		return err // Return found error
