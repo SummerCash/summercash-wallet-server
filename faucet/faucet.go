@@ -16,5 +16,5 @@ type Faucet interface {
 
 	AmountCanClaim(account *accounts.Account) *big.Float // Get the max amount an account can claim.
 
-	Claim(amount *big.Float, account *accounts.Account) error // Claim an amount of summercash from the faucet.
+	Claim(account *accounts.Account, amount *big.Float) error // Claim an amount of summercash from the faucet.
 }

@@ -3,9 +3,15 @@ package faucet
 
 import (
 	"bytes"
+	"errors"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"math/big"
 	"time"
+)
+
+var (
+	// ErrInvalidClaimSize is an error definition describing a case in which a user attempts to claim more than is permitted.
+	ErrInvalidClaimSize = errors.New("invalid claim; user cannot claim with provided amount")
 )
 
 // StandardFaucet outlines a standard faucet conforming to the standard ruleset.
@@ -74,6 +80,29 @@ func (faucet *StandardFaucet) AmountCanClaim(account *accounts.Account) *big.Flo
 	}
 
 	return faucet.Ruleset.MaximumClaim24hr() // Return max claim 24 hours
+}
+
+// Claim claims a given amount from the faucet.
+func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float) error {
+	updatedAccount, err := faucet.WorkingDB().QueryAccountByUsername(account.Name)
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	account = updatedAccount // Set account updated reference
+
+	if amountCanClaim := faucet.AmountCanClaim(account); amountCanClaim.Cmp(amount) == -1 { // Check amount to claim less than can claim
+		return ErrInvalidClaimSize // Return error
+	}
+
+	err = faucet.WorkingDB().MakeFaucetClaim(account, amount) // Make faucet claim
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	return nil // No error occurred, return nil
 }
 
 /* END EXPORTED METHODS */
