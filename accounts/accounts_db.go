@@ -3,6 +3,7 @@
 package accounts
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math/big"
@@ -282,6 +283,41 @@ func (db *DB) QueryAccountByUsername(name string) (*Account, error) {
 		accountBuffer, err = AccountFromBytes(accountBytes) // Deserialize account bytes
 
 		return err // Return error
+	}) // Read account
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	return accountBuffer, nil // Return read account
+}
+
+// QueryAccountByAddress queries the database for an account with a given address.
+func (db *DB) QueryAccountByAddress(address summercashCommon.Address) (*Account, error) {
+	var accountBuffer *Account // Initialize account buffer
+
+	err := db.CreateAccountsBucketIfNotExist() // Create accounts bucket
+
+	if err != nil { // Check for errors
+		return &Account{}, err // Return found error
+	}
+
+	err = db.DB.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(accountsBucket) // Get accounts bucket
+
+		c := bucket.Cursor() // Get cursor
+
+		for _, accountBytes := c.First(); accountBytes != nil; _, accountBytes = c.Next() { // Iterate
+			account, err := AccountFromBytes(accountBytes) // Deserialize account bytes
+
+			if bytes.Equal(account.Address.Bytes(), address.Bytes()) && err != nil { // Check addresses equivalent
+				accountBuffer = account // Set account
+
+				return nil // No error occurred, return nil
+			}
+		}
+
+		return ErrAccountDoesNotExist // Account does not exist
 	}) // Read account
 
 	if err != nil { // Check for errors
