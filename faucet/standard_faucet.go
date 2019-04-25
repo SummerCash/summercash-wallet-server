@@ -30,11 +30,32 @@ func (faucet *StandardFaucet) WorkingDB() *accounts.DB {
 
 // AccountCanClaim checks if a given account can claim summercash.
 func (faucet *StandardFaucet) AccountCanClaim(account *accounts.Account) bool {
+	updatedAccount, err := faucet.AccountsDatabase.QueryAccountByUsername(account.Name) // Set to updated account
+
+	if err != nil { // Check for errors
+		return false // Cannot claim; does not exist
+	}
+
+	account = updatedAccount // Set to updated account reference
+
 	if account.LastFaucetClaimTime.Sub(time.Now()).Hours() < 24 { // Check less than 24 hours
 		return false // Cannot claim
 	}
 
 	return true // Can claim
+}
+
+// AccountLastClaim gets the time at which an account last claimed from the faucet.
+func (faucet *StandardFaucet) AccountLastClaim(account *accounts.Account) time.Time {
+	updatedAccount, err := faucet.AccountsDatabase.QueryAccountByUsername(account.Name) // Set to updated account
+
+	if err != nil { // Check for errors
+		return time.Date(2017, time.January, 12, 0, 0, 0, 0, time.UTC) // Return despacito music video publish date
+	}
+
+	account = updatedAccount // Set to updated account reference
+
+	return account.LastFaucetClaimTime // Return last claim time
 }
 
 /* END EXPORTED METHODS */
