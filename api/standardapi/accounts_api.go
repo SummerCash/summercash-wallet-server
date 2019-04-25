@@ -49,7 +49,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 
 // NewAccount handles a NewAccount request.
 func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	var account *accounts.Account // Initialize account buffer
 	var err error                 // Initialize error buffer
@@ -71,7 +71,7 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 
 // RestAccountPassword handles a ResetAccountPassword request.
 func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	err := api.AccountsDatabase.ResetAccountPassword(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "old_password")), string(common.GetCtxValue(ctx, "new_password"))) // Reset password
 
@@ -94,7 +94,7 @@ func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
 
 // QueryAccount handles a QueryAccount request.
 func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Query account
 
@@ -109,7 +109,7 @@ func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 
 // CalculateAccountBalance handles a CalculateAccountBalance request.
 func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	balance, err := api.AccountsDatabase.GetUserBalance(ctx.UserValue("username").(string)) // Get balance
 
@@ -130,7 +130,7 @@ func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 
 // GetUserTransactions handles a GetUserTransactions request.
 func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	userTransactions, err := api.AccountsDatabase.GetUserTransactions(ctx.UserValue("username").(string)) // Get user transactions
 
@@ -171,7 +171,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 
 // AuthenticateUser handles an AuthenticateUser request.
 func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	if !api.AccountsDatabase.Auth(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) { // Check cannot authenticate
 		logger.Errorf("errored while handling AuthenticateUser request with username %s", ctx.UserValue("username")) // Log error
@@ -192,7 +192,7 @@ func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 
 // DeleteUser handles a DeleteUser request.
 func (api *JSONHTTPAPI) DeleteUser(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Enable CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
 	err := api.AccountsDatabase.DeleteAccount(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) // Delete account
 
