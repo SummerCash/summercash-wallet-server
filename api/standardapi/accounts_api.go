@@ -99,7 +99,7 @@ func (api *JSONHTTPAPI) GetLastUserTxHash(ctx *fasthttp.RequestCtx) {
 		return // Return
 	}
 
-	fmt.Fprintf(ctx, fmt.Sprintf("{%shash%s: %s%s%s", `"`, `"`, `"`, accountChain.Transactions[len(accountChain.Transactions)-1].Hash.String(), `"`)) // Write hash
+	fmt.Fprintf(ctx, fmt.Sprintf("{%shash%s: %s%s%s}", `"`, `"`, `"`, accountChain.Transactions[len(accountChain.Transactions)-1].Hash.String(), `"`)) // Write hash
 }
 
 // ResolveAddress handles a ResolveAddress request.
