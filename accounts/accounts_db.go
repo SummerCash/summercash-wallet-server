@@ -79,8 +79,10 @@ func OpenDB() (*DB, error) {
 		return nil // No error occurred, return nil
 	}) // Create faucet account
 
-	if err.Error() == "must make faucet account" { // Check must make faucet account
-		privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader) // Generate private key
+	if err != nil && err.Error() == "must make faucet account" { // Check must make faucet account
+		var privateKey *ecdsa.PrivateKey // Initialize private key buffer
+
+		privateKey, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader) // Generate private key
 
 		if err != nil { // Check for errors
 			return &DB{}, err // Return found error

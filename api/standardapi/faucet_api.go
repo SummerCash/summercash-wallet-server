@@ -61,7 +61,7 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
 
 	if err != nil { // Check for errors
-		logger.Errorf("errored while handling Claim request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+		logger.Errorf("errored while handling NextClaim request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
 
 		panic(err) // Panic
 	}
@@ -90,7 +90,7 @@ func (api *JSONHTTPAPI) NextClaimAmount(ctx *fasthttp.RequestCtx) {
 	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
 
 	if err != nil { // Check for errors
-		logger.Errorf("errored while handling Claim request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+		logger.Errorf("errored while handling NextClaimAmount request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
 
 		panic(err) // Panic
 	}
