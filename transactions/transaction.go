@@ -68,13 +68,13 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 
 	validator := validator.Validator(validator.NewStandardValidator(config)) // Initialize validator
 
-	err = validator.ValidateTransaction(transaction) // Validate transaction
+	err = types.SignTransaction(transaction, summercashAccount.PrivateKey) // Sign transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
 
-	err = types.SignTransaction(transaction, summercashAccount.PrivateKey) // Sign transaction
+	err = validator.ValidateTransaction(transaction) // Validate transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
