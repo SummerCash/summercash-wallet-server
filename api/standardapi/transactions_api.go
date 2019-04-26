@@ -32,6 +32,12 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 	var recipient summercashCommon.Address // Init recipient buffer
 	var err error                          // Init error buffer
 
+	if string(common.GetCtxValue(ctx, "username")) == "faucet" { // Check wants to send from faucet
+		logger.Errorf("user with address %s tried to send tx from faucet account", ctx.RemoteAddr().String()) // Log error
+
+		panic(errors.New("cannot send transaction from faucet wallet")) // Panic
+	}
+
 	if !strings.Contains(string(common.GetCtxValue(ctx, "recipient")), "0x") { // Check is sending to username
 		recipientAccount, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "recipient"))) // Query account
 

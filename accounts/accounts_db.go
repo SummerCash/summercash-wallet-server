@@ -4,6 +4,7 @@ package accounts
 
 import (
 	"bytes"
+	rand "crypto/rand"
 	"errors"
 	"fmt"
 	"math/big"
@@ -57,11 +58,35 @@ func OpenDB() (*DB, error) {
 		return &DB{}, err // Return found error
 	}
 
-	db, err := bolt.Open(filepath.FromSlash(fmt.Sprintf("%s/smc_db.db", common.DBDir)), 0644, &bolt.Options{Timeout: 5 * time.Second}) // Open DB with timeout
+	database, err := bolt.Open(filepath.FromSlash(fmt.Sprintf("%s/smc_db.db", common.DBDir)), 0644, &bolt.Options{Timeout: 5 * time.Second}) // Open DB with timeout
 
-	return &DB{
-		DB: db, // Set DB
-	}, nil // Return initialized db
+	if err != nil { // Check for errors
+		return &DB{}, err // Return found error
+	}
+
+	db := &DB{
+		DB: database, // Set DB
+	} // Initialize DB
+
+	err = db.DB.Update(func(tx *bolt.Tx) error {
+		if tx.Bucket(accountsBucket) == nil { // Check first account
+			rand, err := rand.Int(rand.Reader, big.NewInt(big.MaxPrec)) // Get random
+
+			if err != nil { // Check for errors
+				return err // Return found error
+			}
+
+			db.CreateNewAccount("faucet", rand.String()) // Create faucet account
+		}
+
+		return nil // No error occurred, return nil
+	}) // Create faucet account
+
+	if err != nil { // Check for errors
+		return &DB{}, err // Return found error
+	}
+
+	return db, nil // Return initialized db
 }
 
 // CloseDB closes the db.
