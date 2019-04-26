@@ -44,7 +44,7 @@ func (faucet *StandardFaucet) AccountCanClaim(account *accounts.Account) bool {
 		return false // Cannot claim; does not exist
 	}
 
-	if updatedAccount.LastFaucetClaimTime.Sub(time.Date(2017, time.January, 12, 0, 0, 0, 0, time.UTC)).Hours() == 0 { // Check not set
+	if updatedAccount.LastFaucetClaimTime.IsZero() { // Check not set
 		return true // Has not claimed yet
 	}
 
