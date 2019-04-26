@@ -66,15 +66,19 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	timeUntilNextClaim := time.Now().Sub(time.Now()) // Init buffer
+	timeUntilNextClaim := time.Duration(0) // Init buffer
+
+	var hours, minutes, seconds string // Init time until string buffers
 
 	if !(*api.Faucet).AccountCanClaim(account) { // Check can claim
 		timeUntilNextClaim = time.Until((*api.Faucet).AccountLastClaim(account).Add((*(*api.Faucet).GetRuleset()).GetClaimPeriod())) // Get time until next claim
-	}
 
-	hours := strings.Split(timeUntilNextClaim.String(), "h")[0]                                                                        // Get hours until
-	minutes := strings.Split(strings.Split(timeUntilNextClaim.String(), "h")[1], "m")[0]                                               // Get minutes until
-	seconds := strings.Split(strings.Split(strings.Split(strings.Split(timeUntilNextClaim.String(), "h")[1], "m")[1], "s")[0], ".")[0] // Get seconds until
+		hours = strings.Split(timeUntilNextClaim.String(), "h")[0]                                                                        // Get hours until
+		minutes = strings.Split(strings.Split(timeUntilNextClaim.String(), "h")[1], "m")[0]                                               // Get minutes until
+		seconds = strings.Split(strings.Split(strings.Split(strings.Split(timeUntilNextClaim.String(), "h")[1], "m")[1], "s")[0], ".")[0] // Get seconds until
+	} else {
+		hours, minutes, seconds = "00", "00", "00" // Set to 0
+	}
 
 	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s}", `"`, `"`, `"`, fmt.Sprintf("%s:%s:%s", hours, minutes, seconds), `"`)) // Write time until
 }
