@@ -64,9 +64,13 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	timeUntilNextClaim := (*api.Faucet).AccountLastClaim(account).Sub(time.Now()) // Get time until next claim
+	var timeUntilNextClaim = time.Now().Sub(time.Now()) // Init buffer
 
-	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s", `"`, `"`, `"`, fmt.Sprintf("%f:%f:%f", timeUntilNextClaim.Hours(), timeUntilNextClaim.Minutes(), timeUntilNextClaim.Seconds()), `"`)) // Write time until
+	if !(*api.Faucet).AccountCanClaim(account) { // Check can claim
+		timeUntilNextClaim = (*api.Faucet).AccountLastClaim(account).Sub(time.Now()) // Get time until next claim
+	}
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s}", `"`, `"`, `"`, fmt.Sprintf("%f:%f:%f", timeUntilNextClaim.Hours(), timeUntilNextClaim.Minutes(), timeUntilNextClaim.Seconds()), `"`)) // Write time until
 }
 
 /* END EXPORTED METHODS */
