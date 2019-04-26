@@ -6,6 +6,7 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/valyala/fasthttp"
 	"math/big"
+	"strings"
 	"time"
 )
 
@@ -65,13 +66,17 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	var timeUntilNextClaim = time.Now().Sub(time.Now()) // Init buffer
+	timeUntilNextClaim := time.Now().Sub(time.Now()) // Init buffer
 
 	if !(*api.Faucet).AccountCanClaim(account) { // Check can claim
-		timeUntilNextClaim = (*api.Faucet).AccountLastClaim(account).Sub(time.Now()) // Get time until next claim
+		timeUntilNextClaim = time.Until((*api.Faucet).AccountLastClaim(account).Add(24 * time.Hour)) // Get time until next claim
 	}
 
-	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s}", `"`, `"`, `"`, fmt.Sprintf("%d:%d:%d", uint(timeUntilNextClaim.Hours()), uint(timeUntilNextClaim.Minutes()), uint(timeUntilNextClaim.Seconds())), `"`)) // Write time until
+	hours := strings.Split(timeUntilNextClaim.String(), "h")[0]                                                                        // Get hours until
+	minutes := strings.Split(strings.Split(timeUntilNextClaim.String(), "h")[1], "m")[0]                                               // Get minutes until
+	seconds := strings.Split(strings.Split(strings.Split(strings.Split(timeUntilNextClaim.String(), "h")[1], "m")[1], "s")[0], ".")[0] // Get seconds until
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s}", `"`, `"`, `"`, fmt.Sprintf("%s:%s:%s", hours, minutes, seconds), `"`)) // Write time until
 }
 
 // NextClaimAmount handles a NextClaimAmount request.
