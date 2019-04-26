@@ -81,7 +81,7 @@ func (faucet *StandardFaucet) AmountCanClaim(account *accounts.Account) *big.Flo
 		}
 	}
 
-	if faucet.AccountLastClaim(updatedAccount).Sub(time.Now()).Hours() < 24 { // Check less than 24 hours since last claim
+	if faucet.AccountLastClaim(updatedAccount).Sub(time.Now()).Hours() < 24 && !faucet.AccountLastClaim(updatedAccount).IsZero() { // Check less than 24 hours since last claim
 		return big.NewFloat(0) // Cannot claim
 	}
 
