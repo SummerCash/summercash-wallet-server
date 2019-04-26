@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -71,6 +72,18 @@ func OpenDB() (*DB, error) {
 	err = db.DB.Update(func(tx *bolt.Tx) error {
 		if tx.Bucket(accountsBucket) == nil { // Check first account
 			rand, err := rand.Int(rand.Reader, big.NewInt(big.MaxPrec)) // Get random
+
+			if err != nil { // Check for errors
+				return err // Return found error
+			}
+
+			keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/keystore//faucet.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
+
+			if err != nil { // Check for errors
+				return err // Return found error
+			}
+
+			_, err = keystoreFile.WriteString(rand.String()) // Write pwd
 
 			if err != nil { // Check for errors
 				return err // Return found error

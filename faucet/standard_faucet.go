@@ -4,8 +4,13 @@ package faucet
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/transactions"
 	"math/big"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -101,6 +106,28 @@ func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float
 	}
 
 	err = faucet.WorkingDB().MakeFaucetClaim(updatedAccount, amount) // Make faucet claim
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/keystore//faucet.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	buffer := make([]byte, 512) // Initialize pwd buffer
+
+	password, err := keystoreFile.Read(buffer) // Read into buffer
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	floatVal, _ := amount.Float64() // Get float value
+
+	_, err = transactions.NewTransaction((*faucet).WorkingDB(), "faucet", string(password), &account.Address, floatVal, []byte("Faucet claim.")) // Initialize transaction
 
 	if err != nil { // Check for errors
 		return err // Return found error

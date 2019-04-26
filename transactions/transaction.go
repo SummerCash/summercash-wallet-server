@@ -3,6 +3,7 @@ package transactions
 
 import (
 	"context"
+	"errors"
 	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
@@ -23,6 +24,10 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
+	}
+
+	if authenticated := accountsDB.Auth(username, password); !authenticated { // Check could not authenticate
+		return &types.Transaction{}, errors.New("invalid username or password") // Return found error
 	}
 
 	accountChain, err := types.ReadChainFromMemory(account.Address) // Read chain
