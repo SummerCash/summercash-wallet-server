@@ -6,6 +6,7 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/valyala/fasthttp"
 	"math/big"
+	"time"
 )
 
 /* BEGIN EXPORTED METHODS */
@@ -14,7 +15,8 @@ import (
 func (api *JSONHTTPAPI) SetupFaucetRoutes() error {
 	faucetAPIRoot := "/api/faucet" // Get faucet API root path
 
-	api.Router.POST(fmt.Sprintf("%s/Claim", faucetAPIRoot), api.Claim) // Set Claim post
+	api.Router.POST(fmt.Sprintf("%s/Claim", faucetAPIRoot), api.Claim)        // Set Claim post
+	api.Router.GET(fmt.Sprintf("%s/NextClaim", faucetAPIRoot), api.NextClaim) // Set Claim post
 
 	return nil // No error occurred, return nil
 }
@@ -48,6 +50,23 @@ func (api *JSONHTTPAPI) Claim(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, fmt.Sprintf("{%smessage%s: %sFaucet bounty claimed successfully%s}", `"`, `"`, `"`, `"`)) // Write response
+}
+
+// NextClaim handles a NextClaim request.
+func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+
+	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling Claim request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	timeUntilNextClaim := (*api.Faucet).AccountLastClaim(account).Sub(time.Now()) // Get time until next claim
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s", `"`, `"`, `"`, fmt.Sprintf("%s:%s:%s", timeUntilNextClaim.Hours(), timeUntilNextClaim.Minutes(), timeUntilNextClaim.Seconds()), `"`)) // Write time until
 }
 
 /* END EXPORTED METHODS */
