@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
@@ -218,7 +217,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 			AccountNonce:            transaction.AccountNonce,                                                   // Set account nonce
 			SenderHex:               sender,                                                                     // Set sender hex
 			RecipientHex:            recipient,                                                                  // Set recipient hex
-			Amount:                  strconv.FormatFloat(floatVal, 'f', 9, 64),                                  // Set amount
+			Amount:                  floatVal,                                                                   // Set amount
 			Payload:                 transaction.Payload,                                                        // Set payload
 			Signature:               transaction.Signature,                                                      // Set signature
 			ParentTx:                transaction.ParentTx,                                                       // Set parent
