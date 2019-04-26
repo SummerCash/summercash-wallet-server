@@ -33,6 +33,7 @@ var (
 	networkFlag       = flag.String("network", "main_net", "starts the go-summercash node on a given network")      // Init network flag
 	apiPortFlag       = flag.Int("api-port", 443, "starts api on given port")                                       // Init API port flag
 	contentDirFlag    = flag.String("content-dir", filepath.FromSlash("./app"), "serves a given content directory") // Init content dir flag
+	dataDirFlag       = flag.String("data-dir", common.DataDir, "starts node with given data directory")            // Init data dir flag
 	faucetRewardFlag  = flag.Float64("faucet-reward", 0.00001, "starts faucet api with a given reward amount")      // Init faucet reward flag
 	useRemoteNodeFlag = flag.Bool("use-remote-node", false, "skips node start, assumes remote node is up to date")  // Init remote node flag
 
@@ -46,6 +47,8 @@ var (
 // main is the summercash-wallet-server entry point.
 func main() {
 	flag.Parse() // Parse flags
+
+	common.DataDir = filepath.FromSlash(*dataDirFlag) // Set data dir
 
 	defer cancel()        // Cancel
 	defer logFile.Close() // Close log file
