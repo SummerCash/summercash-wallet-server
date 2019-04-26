@@ -2,6 +2,7 @@
 package standardapi
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
