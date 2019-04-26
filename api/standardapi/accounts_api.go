@@ -199,10 +199,22 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 	var stringTransactions []*types.StringTransaction // Init string tx buffer
 
 	for _, transaction := range userTransactions { // Iterate through user txs
+		var sender string = transaction.Sender.String() // Get sender string value
+
+		var recipient string = transaction.Recipient.String() // Get recipient string value
+
+		if resolvedRecipient, err := api.AccountsDatabase.QueryAccountByAddress(*transaction.Recipient); err == nil { // Check could resolve
+			recipient = resolvedRecipient.Name // Set resolved recipient
+		}
+
+		if resolvedSender, err := api.AccountsDatabase.QueryAccountByAddress(*transaction.Sender); err == nil { // Check could resolve
+			sender = resolvedSender.Name // Set resolved sender
+		}
+
 		stringTransaction := &types.StringTransaction{
 			AccountNonce:            transaction.AccountNonce,                                                   // Set account nonce
-			SenderHex:               transaction.Sender.String(),                                                // Set sender hex
-			RecipientHex:            transaction.Recipient.String(),                                             // Set recipient hex
+			SenderHex:               sender,                                                                     // Set sender hex
+			RecipientHex:            recipient,                                                                  // Set recipient hex
 			Amount:                  transaction.Amount.String(),                                                // Set amount
 			Payload:                 transaction.Payload,                                                        // Set payload
 			Signature:               transaction.Signature,                                                      // Set signature
