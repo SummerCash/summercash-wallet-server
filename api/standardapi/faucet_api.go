@@ -15,8 +15,8 @@ import (
 func (api *JSONHTTPAPI) SetupFaucetRoutes() error {
 	faucetAPIRoot := "/api/faucet" // Get faucet API root path
 
-	api.Router.POST(fmt.Sprintf("%s/Claim", faucetAPIRoot), api.Claim)        // Set Claim post
-	api.Router.GET(fmt.Sprintf("%s/NextClaim", faucetAPIRoot), api.NextClaim) // Set Claim post
+	api.Router.POST(fmt.Sprintf("%s/Claim", faucetAPIRoot), api.Claim)                  // Set Claim post
+	api.Router.GET(fmt.Sprintf("%s/:username/NextClaim", faucetAPIRoot), api.NextClaim) // Set Claim post
 
 	return nil // No error occurred, return nil
 }
