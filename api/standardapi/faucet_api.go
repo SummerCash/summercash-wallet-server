@@ -69,7 +69,7 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 	timeUntilNextClaim := time.Now().Sub(time.Now()) // Init buffer
 
 	if !(*api.Faucet).AccountCanClaim(account) { // Check can claim
-		timeUntilNextClaim = time.Until((*api.Faucet).AccountLastClaim(account).Add(24 * time.Hour)) // Get time until next claim
+		timeUntilNextClaim = time.Until((*api.Faucet).AccountLastClaim(account).Add((*(*api.Faucet).GetRuleset()).GetClaimPeriod())) // Get time until next claim
 	}
 
 	hours := strings.Split(timeUntilNextClaim.String(), "h")[0]                                                                        // Get hours until

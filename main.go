@@ -179,7 +179,7 @@ func startServingStandardHTTPJSONAPI() error {
 		os.Exit(0) // Exit
 	}()
 
-	ruleset := faucet.NewStandardRuleset(big.NewFloat(*faucetRewardFlag), []*accounts.Account{}) // Initialize ruleset
+	ruleset := faucet.NewStandardRuleset(big.NewFloat(*faucetRewardFlag), 6*time.Hour, []*accounts.Account{}) // Initialize ruleset
 
 	standardFaucet := faucet.NewStandardFaucet(ruleset, db) // Initialize faucet
 

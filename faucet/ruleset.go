@@ -3,13 +3,17 @@ package faucet
 
 import (
 	"github.com/SummerCash/summercash-wallet-server/accounts"
+
 	"math/big"
+	"time"
 )
 
 // Ruleset defines all methods necessary to implement a ruleset.
 type Ruleset interface {
-	MaximumClaim24hr() *big.Float // Get max amount can claim in 24 hours.
-	MinimumClaim24hr() *big.Float // Get min amount can claim in 24 hours.
+	MaximumClaimInPeriod() *big.Float // Get max amount can claim in 24 hours.
+	MinimumClaimInPeriod() *big.Float // Get min amount can claim in 24 hours.
+
+	GetClaimPeriod() time.Duration // Get duration between possible claims
 
 	DepositClaimCurve() float64 // Get amount to multiply possible claim by deposit by.
 

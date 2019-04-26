@@ -48,7 +48,7 @@ func (faucet *StandardFaucet) AccountCanClaim(account *accounts.Account) bool {
 		return true // Has not claimed yet
 	}
 
-	if updatedAccount.LastFaucetClaimTime.Sub(time.Now()).Hours() < 24 { // Check less than 24 hours since last claim
+	if updatedAccount.LastFaucetClaimTime.Sub(time.Now()).Hours() < (*faucet.GetRuleset()).GetClaimPeriod().Hours() { // Check less than 24 hours since last claim
 		return false // Cannot claim
 	}
 
@@ -81,11 +81,11 @@ func (faucet *StandardFaucet) AmountCanClaim(account *accounts.Account) *big.Flo
 		}
 	}
 
-	if faucet.AccountLastClaim(updatedAccount).Sub(time.Now()).Hours() < 24 && !faucet.AccountLastClaim(updatedAccount).IsZero() { // Check less than 24 hours since last claim
+	if faucet.AccountLastClaim(updatedAccount).Sub(time.Now()).Hours() < (*faucet.GetRuleset()).GetClaimPeriod().Hours() && !faucet.AccountLastClaim(updatedAccount).IsZero() { // Check less than 24 hours since last claim
 		return big.NewFloat(0) // Cannot claim
 	}
 
-	return faucet.Ruleset.MaximumClaim24hr() // Return max claim 24 hours
+	return faucet.Ruleset.MaximumClaimInPeriod() // Return max claim 24 hours
 }
 
 // Claim claims a given amount from the faucet.
@@ -107,6 +107,11 @@ func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float
 	}
 
 	return nil // No error occurred, return nil
+}
+
+// GetRuleset gets the working ruleset.
+func (faucet *StandardFaucet) GetRuleset() *Ruleset {
+	return &faucet.Ruleset // Return ruleset
 }
 
 /* END EXPORTED METHODS */

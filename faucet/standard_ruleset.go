@@ -4,11 +4,14 @@ package faucet
 import (
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"math/big"
+	"time"
 )
 
 // StandardRuleset outlines the standard ruleset implementation.
 type StandardRuleset struct {
-	Claim24hr *big.Float `json:"claim_24hr"` // Amount can claim in 24 hours.
+	ClaimInPeriod *big.Float `json:"claim_24hr"` // Amount can claim in 24 hours.
+
+	ClaimPeriod time.Duration `json:"claim_period"` // Claim period
 
 	BannedUsersList []*accounts.Account `json:"banned_users"` // Banned users.
 }
@@ -16,21 +19,27 @@ type StandardRuleset struct {
 /* BEGIN EXPORTED METHODS */
 
 // NewStandardRuleset creates a new StandardRuleset instance with a given 24 hour claim amount and banned users list.
-func NewStandardRuleset(claim24hr *big.Float, bannedUsers []*accounts.Account) *StandardRuleset {
+func NewStandardRuleset(claimInPeriod *big.Float, claimPeriod time.Duration, bannedUsers []*accounts.Account) *StandardRuleset {
 	return &StandardRuleset{
-		Claim24hr:       claim24hr,   // Set claim
-		BannedUsersList: bannedUsers, // Set banned users
+		ClaimInPeriod:   claimInPeriod, // Set claim
+		ClaimPeriod:     claimPeriod,   // Set period
+		BannedUsersList: bannedUsers,   // Set banned users
 	}
 }
 
-// MaximumClaim24hr gets the max amount one user can claim in 24 hours.
-func (ruleset *StandardRuleset) MaximumClaim24hr() *big.Float {
-	return ruleset.Claim24hr // Return claim amount in 24 hours
+// MaximumClaimInPeriod gets the max amount one user can claim in 24 hours.
+func (ruleset *StandardRuleset) MaximumClaimInPeriod() *big.Float {
+	return ruleset.ClaimInPeriod // Return claim amount in 24 hours
 }
 
-// MinimumClaim24hr gets the min amount on user can claim in 24 hours.
-func (ruleset *StandardRuleset) MinimumClaim24hr() *big.Float {
+// MinimumClaimInPeriod gets the min amount on user can claim in 24 hours.
+func (ruleset *StandardRuleset) MinimumClaimInPeriod() *big.Float {
 	return big.NewFloat(0) // No minimum for standard ruleset
+}
+
+// GetClaimPeriod gets the claim duration.
+func (ruleset *StandardRuleset) GetClaimPeriod() time.Duration {
+	return ruleset.ClaimPeriod // Return claim period
 }
 
 // DepositClaimCurve gets the claim curve.
