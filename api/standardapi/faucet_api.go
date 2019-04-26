@@ -15,8 +15,9 @@ import (
 func (api *JSONHTTPAPI) SetupFaucetRoutes() error {
 	faucetAPIRoot := "/api/faucet" // Get faucet API root path
 
-	api.Router.POST(fmt.Sprintf("%s/Claim", faucetAPIRoot), api.Claim)                  // Set Claim post
-	api.Router.GET(fmt.Sprintf("%s/:username/NextClaim", faucetAPIRoot), api.NextClaim) // Set Claim post
+	api.Router.POST(fmt.Sprintf("%s/Claim", faucetAPIRoot), api.Claim)                              // Set Claim post
+	api.Router.GET(fmt.Sprintf("%s/:username/NextClaimTime", faucetAPIRoot), api.NextClaim)         // Set Claim get
+	api.Router.GET(fmt.Sprintf("%s/:username/NextClaimAmount", faucetAPIRoot), api.NextClaimAmount) // Set Claim amount get
 
 	return nil // No error occurred, return nil
 }
@@ -71,6 +72,29 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, fmt.Sprintf("{%stime%s: %s%s%s}", `"`, `"`, `"`, fmt.Sprintf("%d:%d:%d", uint(timeUntilNextClaim.Hours()), uint(timeUntilNextClaim.Minutes()), uint(timeUntilNextClaim.Seconds())), `"`)) // Write time until
+}
+
+// NextClaimAmount handles a NextClaimAmount request.
+func (api *JSONHTTPAPI) NextClaimAmount(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+
+	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling Claim request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	amount := (*api.Faucet).AmountCanClaim(account) // Get amount can claim
+
+	if amount.Cmp(big.NewFloat(0)) == 0 { // Check is zero
+		amount = account.LastFaucetClaimAmount // Get last account claim
+	}
+
+	intVal, _ := amount.Float64() // Get float value
+
+	fmt.Fprintf(ctx, fmt.Sprintf("{%samount%s: %s%f%s}", `"`, `"`, `"`, intVal, `"`)) // Write time until
 }
 
 /* END EXPORTED METHODS */
