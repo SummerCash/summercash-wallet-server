@@ -7,6 +7,7 @@ import (
 	rand "crypto/rand"
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -71,7 +72,7 @@ func OpenDB() (*DB, error) {
 
 	err = db.DB.Update(func(tx *bolt.Tx) error {
 		if tx.Bucket(accountsBucket) == nil { // Check first account
-			rand, err := rand.Int(rand.Reader, big.NewInt(big.MaxPrec)) // Get random
+			rand, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64)) // Get random
 
 			if err != nil { // Check for errors
 				return err // Return found error
