@@ -11,6 +11,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -111,7 +112,7 @@ func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float
 		return err // Return found error
 	}
 
-	keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/keystore//faucet.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
+	keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/keystore/faucet/privateKey.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
 
 	if err != nil { // Check for errors
 		return err // Return found error
@@ -119,15 +120,17 @@ func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float
 
 	buffer := make([]byte, 512) // Initialize pwd buffer
 
-	password, err := keystoreFile.Read(buffer) // Read into buffer
+	_, err = keystoreFile.Read(buffer) // Read into buffer
 
 	if err != nil { // Check for errors
 		return err // Return found error
 	}
 
+	splitPassword := strings.Split(string(buffer), ":") // Split
+
 	floatVal, _ := amount.Float64() // Get float value
 
-	_, err = transactions.NewTransaction((*faucet).WorkingDB(), "faucet", string(password), &account.Address, floatVal, []byte("Faucet claim.")) // Initialize transaction
+	_, err = transactions.NewTransaction((*faucet).WorkingDB(), "faucet", string(splitPassword[0]+splitPassword[1]), &account.Address, floatVal, []byte("Faucet claim.")) // Initialize transaction
 
 	if err != nil { // Check for errors
 		return err // Return found error
