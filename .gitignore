@@ -22,3 +22,6 @@ common/test/
 
 # Node Data
 data/
+
+# Service
+server.sh
