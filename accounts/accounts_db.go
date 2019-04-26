@@ -81,6 +81,12 @@ func OpenDB() (*DB, error) {
 				return err // Return found error
 			}
 
+			err = common.CreateDirIfDoesNotExit(fmt.Sprintf("%s/keystore/faucet", common.DataDir)) // Create faucet keystore dir
+
+			if err != nil { // Check for errors
+				return err // Return found error
+			}
+
 			keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/keystore/faucet/privateKey.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
 
 			if err != nil { // Check for errors
