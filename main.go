@@ -33,7 +33,7 @@ var (
 	networkFlag      = flag.String("network", "main_net", "starts the go-summercash node on a given network")      // Init network flag
 	apiPortFlag      = flag.Int("api-port", 443, "starts api on given port")                                       // Init API port flag
 	contentDirFlag   = flag.String("content-dir", filepath.FromSlash("./app"), "serves a given content directory") // Init content dir flag
-	faucetRewardFlag = flag.Float64("faucet-reward", 0.01, "starts faucet api with a given reward amount")         // Init faucet reward flag
+	faucetRewardFlag = flag.Float64("faucet-reward", 0.00001, "starts faucet api with a given reward amount")      // Init faucet reward flag
 
 	logger = loggo.GetLogger("") // Get logger
 
