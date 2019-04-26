@@ -112,7 +112,7 @@ func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float
 		return err // Return found error
 	}
 
-	keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/keystore/faucet/privateKey.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
+	keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/faucet/keystore/privateKey.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
 
 	if err != nil { // Check for errors
 		return err // Return found error
