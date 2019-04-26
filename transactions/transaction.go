@@ -7,7 +7,9 @@ import (
 	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
+	"github.com/SummerCash/go-summercash/config"
 	"github.com/SummerCash/go-summercash/types"
+	"github.com/SummerCash/go-summercash/validator"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 
 	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
@@ -53,6 +55,20 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 	}
 
 	summercashAccount, err := summercashAccounts.ReadAccountFromMemory(account.Address) // Read account
+
+	if err != nil { // Check for errors
+		return &types.Transaction{}, err // Return found error
+	}
+
+	config, err := config.ReadChainConfigFromMemory() // Read config from memory
+
+	if err != nil { // Check for errors
+		return &types.Transaction{}, err // Return found error
+	}
+
+	validator := validator.Validator(validator.NewStandardValidator(config)) // Initialize validator
+
+	err = validator.ValidateTransaction(transaction) // Validate transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
