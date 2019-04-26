@@ -18,6 +18,8 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/SummerCash/summercash-wallet-server/faucet"
 
+	summercashCommon "github.com/SummerCash/go-summercash/common"
+
 	"github.com/juju/loggo"
 	"github.com/juju/loggo/loggocolor"
 
@@ -48,7 +50,8 @@ var (
 func main() {
 	flag.Parse() // Parse flags
 
-	common.DataDir = filepath.FromSlash(*dataDirFlag) // Set data dir
+	common.DataDir = filepath.FromSlash(*dataDirFlag)           // Set data dir
+	summercashCommon.DataDir = filepath.FromSlash(*dataDirFlag) // Set data dir
 
 	defer cancel()        // Cancel
 	defer logFile.Close() // Close log file
