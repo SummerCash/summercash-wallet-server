@@ -73,37 +73,43 @@ func OpenDB() (*DB, error) {
 
 	err = db.DB.Update(func(tx *bolt.Tx) error {
 		if tx.Bucket(accountsBucket) == nil { // Check first account
-			tx.CreateBucket(accountsBucket) // Create accounts bucket
-
-			privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader) // Generate private key
-
-			if err != nil { // Check for errors
-				return err // Return found error
-			}
-
-			err = common.CreateDirIfDoesNotExit(fmt.Sprintf("%s/faucet/keystore", common.DataDir)) // Create faucet keystore dir
-
-			if err != nil { // Check for errors
-				return err // Return found error
-			}
-
-			keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/faucet/keystore/privateKey.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
-
-			if err != nil { // Check for errors
-				return err // Return found error
-			}
-
-			_, err = keystoreFile.WriteString(privateKey.X.String() + ":" + privateKey.Y.String()) // Write pwd
-
-			if err != nil { // Check for errors
-				return err // Return found error
-			}
-
-			db.CreateNewAccount("faucet", privateKey.X.String()+privateKey.Y.String()) // Create faucet account
+			return errors.New("must make faucet account") // Return must make error
 		}
 
 		return nil // No error occurred, return nil
 	}) // Create faucet account
+
+	if err.Error() == "must make faucet account" { // Check must make faucet account
+		privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader) // Generate private key
+
+		if err != nil { // Check for errors
+			return &DB{}, err // Return found error
+		}
+
+		err = common.CreateDirIfDoesNotExit(fmt.Sprintf("%s/faucet/keystore", common.DataDir)) // Create faucet keystore dir
+
+		if err != nil { // Check for errors
+			return &DB{}, err // Return found error
+		}
+
+		keystoreFile, err := os.OpenFile(filepath.FromSlash(fmt.Sprintf("%s/faucet/keystore/privateKey.key", common.DataDir)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666) // Open keystore dir
+
+		if err != nil { // Check for errors
+			return &DB{}, err // Return found error
+		}
+
+		_, err = keystoreFile.WriteString(privateKey.X.String() + ":" + privateKey.Y.String()) // Write pwd
+
+		if err != nil { // Check for errors
+			return &DB{}, err // Return found error
+		}
+
+		_, err = db.CreateNewAccount("faucet", privateKey.X.String()+privateKey.Y.String()) // Create faucet account
+
+		if err != nil { // Check for errors
+			return &DB{}, err // Return found error
+		}
+	}
 
 	if err != nil { // Check for errors
 		return &DB{}, err // Return found error
