@@ -100,6 +100,8 @@ func OpenDB() (*DB, error) {
 			return &DB{}, err // Return found error
 		}
 
+		defer keystoreFile.Close() // Close keystore file
+
 		_, err = keystoreFile.WriteString(privateKey.X.String() + ":" + privateKey.Y.String()) // Write pwd
 
 		if err != nil { // Check for errors
