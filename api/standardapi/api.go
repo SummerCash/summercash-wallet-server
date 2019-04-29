@@ -4,14 +4,15 @@ package standardapi
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SummerCash/summercash-wallet-server/faucet"
 	"path/filepath"
 	"strings"
 
-	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"github.com/buaazp/fasthttprouter"
 	"github.com/juju/loggo"
 	"github.com/valyala/fasthttp"
+
+	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/faucet"
 )
 
 var (
@@ -26,6 +27,8 @@ type JSONHTTPAPI struct {
 	Provider string `json:"provider"` // Node provider
 
 	Router *fasthttprouter.Router `json:"-"` // Router
+
+	ContentRouter *fasthttprouter.Router `json:"-"` // Content router
 
 	AccountsDatabase *accounts.DB `json:"-"` // Accounts database
 
@@ -74,14 +77,15 @@ func (api *JSONHTTPAPI) GetResponseType() string {
 
 // StartServing starts serving the API.
 func (api *JSONHTTPAPI) StartServing() error {
-	api.Router = fasthttprouter.New() // Initialize router
+	api.Router = fasthttprouter.New()        // Initialize router
+	api.ContentRouter = fasthttprouter.New() // Initialize content router
 
 	var err error // Init error buffer
 
 	if api.ContentDir != "" { // Check should serve content
 		api.ContentDir, _ = filepath.Abs(api.ContentDir) // Get absolute path
 
-		api.Router.ServeFiles("/app/*filepath", api.ContentDir) // Serve files
+		api.ContentRouter.ServeFiles("/*filepath", api.ContentDir) // Serve files
 	}
 
 	api.Router.PanicHandler = api.HandlePanic // Set panic handler
@@ -105,6 +109,12 @@ func (api *JSONHTTPAPI) StartServing() error {
 	}
 
 	err = fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	err = fasthttp.ListenAndServeTLS(":443", "generalCert.pem", "generalKey.pem", api.ContentRouter.Handler) // Start serving
 
 	if err != nil { // Check for errors
 		return err // Return found error
