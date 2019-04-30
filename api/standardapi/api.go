@@ -4,6 +4,7 @@ package standardapi
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -82,7 +83,13 @@ func (api *JSONHTTPAPI) StartServing() error {
 
 	var err error // Init error buffer
 
+	serveContent := false // Should serve content
+
 	if api.ContentDir != "" { // Check should serve content
+		if _, err := os.Stat(api.ContentDir); !os.IsNotExist(err) { // Check can serve content
+			serveContent = true // Set can serve
+		}
+
 		api.ContentDir, _ = filepath.Abs(api.ContentDir) // Get absolute path
 
 		api.ContentRouter.ServeFiles("/wallet/*filepath", api.ContentDir) // Serve files
@@ -110,10 +117,12 @@ func (api *JSONHTTPAPI) StartServing() error {
 
 	go fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
 
-	err = fasthttp.ListenAndServeTLS(":443", "generalCert.pem", "generalKey.pem", api.ContentRouter.Handler) // Start serving
+	if serveContent { // Check can serve content dir
+		err = fasthttp.ListenAndServeTLS(":443", "generalCert.pem", "generalKey.pem", api.ContentRouter.Handler) // Start serving
 
-	if err != nil { // Check for errors
-		return err // Return found error
+		if err != nil { // Check for errors
+			return err // Return found error
+		}
 	}
 
 	return nil // No error occurred, return nil
