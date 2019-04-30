@@ -85,7 +85,7 @@ func (api *JSONHTTPAPI) StartServing() error {
 	if api.ContentDir != "" { // Check should serve content
 		api.ContentDir, _ = filepath.Abs(api.ContentDir) // Get absolute path
 
-		api.ContentRouter.ServeFiles("/*filepath", api.ContentDir) // Serve files
+		api.ContentRouter.ServeFiles("/wallet/*filepath", api.ContentDir) // Serve files
 	}
 
 	api.Router.PanicHandler = api.HandlePanic // Set panic handler
