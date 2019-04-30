@@ -108,11 +108,7 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
-	err = fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
+	go fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
 
 	err = fasthttp.ListenAndServeTLS(":443", "generalCert.pem", "generalKey.pem", api.ContentRouter.Handler) // Start serving
 
