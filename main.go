@@ -33,7 +33,7 @@ var (
 	nodeRPCPortFlag   = flag.Int("node-rpc-port", 8080, "starts the go-summercash RPC server on a given port")      // Init node rpc port flag
 	nodePortFlag      = flag.Int("node-port", 3000, "starts the go-summercash node on a given port")                // Init node port flag
 	networkFlag       = flag.String("network", "main_net", "starts the go-summercash node on a given network")      // Init network flag
-	apiPortFlag       = flag.Int("api-port", 3033, "starts api on given port")                                      // Init API port flag
+	apiPortFlag       = flag.Int("api-port", 2053, "starts api on given port")                                      // Init API port flag
 	contentDirFlag    = flag.String("content-dir", filepath.FromSlash("./app"), "serves a given content directory") // Init content dir flag
 	dataDirFlag       = flag.String("data-dir", common.DataDir, "starts node with given data directory")            // Init data dir flag
 	faucetRewardFlag  = flag.Float64("faucet-reward", 0.00001, "starts faucet api with a given reward amount")      // Init faucet reward flag
