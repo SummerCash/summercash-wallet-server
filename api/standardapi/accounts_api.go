@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/valyala/fasthttp"
+
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
-
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"github.com/SummerCash/summercash-wallet-server/common"
-
-	"github.com/valyala/fasthttp"
 )
 
 // calcBalanceResponse represents a response to a CalcBalance request.
@@ -243,18 +242,18 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
 
-	if !api.AccountsDatabase.Auth(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) { // Check cannot authenticate
-		logger.Errorf("errored while handling AuthenticateUser request with username %s", ctx.UserValue("username")) // Log error
-
-		panic(errors.New("invalid username or password")) // panic
-	}
-
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Get account
 
 	if err != nil { // Check for errors
 		logger.Errorf("errored while handling AuthenticateUser request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
 
 		panic(err) // panic
+	}
+
+	if !api.AccountsDatabase.Auth(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) { // Check cannot authenticate
+		logger.Errorf("errored while handling AuthenticateUser request with username %s", ctx.UserValue("username")) // Log error
+
+		panic(errors.New("invalid username or password")) // panic
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with user details
