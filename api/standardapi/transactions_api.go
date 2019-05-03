@@ -29,6 +29,7 @@ func (api *JSONHTTPAPI) SetupTransactionsRoutes() error {
 // NewTransaction handles a NewTransaction request.
 func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	var recipient summercashCommon.Address // Init recipient buffer
 	var err error                          // Init error buffer
