@@ -26,8 +26,9 @@ func (api *JSONHTTPAPI) SetupFaucetRoutes() error {
 
 // Claim handles a Claim request.
 func (api *JSONHTTPAPI) Claim(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
-	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
 
@@ -58,8 +59,9 @@ func (api *JSONHTTPAPI) Claim(ctx *fasthttp.RequestCtx) {
 
 // NextClaim handles a NextClaim request.
 func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
-	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
 
@@ -88,8 +90,9 @@ func (api *JSONHTTPAPI) NextClaim(ctx *fasthttp.RequestCtx) {
 
 // NextClaimAmount handles a NextClaimAmount request.
 func (api *JSONHTTPAPI) NextClaimAmount(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
-	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
 

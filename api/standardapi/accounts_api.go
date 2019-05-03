@@ -53,6 +53,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 // NewAccount handles a NewAccount request.
 func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	var account *accounts.Account // Initialize account buffer
@@ -76,6 +77,7 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 // GetLastUserTxHash handles a GetLastUserTxHash request.
 func (api *JSONHTTPAPI) GetLastUserTxHash(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
@@ -106,6 +108,7 @@ func (api *JSONHTTPAPI) GetLastUserTxHash(ctx *fasthttp.RequestCtx) {
 // ResolveAddress handles a ResolveAddress request.
 func (api *JSONHTTPAPI) ResolveAddress(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	address, err := summercashCommon.StringToAddress(string(common.GetCtxValue(ctx, "address"))) // Parse address
@@ -130,6 +133,7 @@ func (api *JSONHTTPAPI) ResolveAddress(ctx *fasthttp.RequestCtx) {
 // RestAccountPassword handles a ResetAccountPassword request.
 func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	err := api.AccountsDatabase.ResetAccountPassword(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "old_password")), string(common.GetCtxValue(ctx, "new_password"))) // Reset password
@@ -154,6 +158,7 @@ func (api *JSONHTTPAPI) RestAccountPassword(ctx *fasthttp.RequestCtx) {
 // QueryAccount handles a QueryAccount request.
 func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Query account
@@ -170,6 +175,7 @@ func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 // CalculateAccountBalance handles a CalculateAccountBalance request.
 func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	balance, err := api.AccountsDatabase.GetUserBalance(ctx.UserValue("username").(string)) // Get balance
@@ -192,6 +198,7 @@ func (api *JSONHTTPAPI) CalculateAccountBalance(ctx *fasthttp.RequestCtx) {
 // GetUserTransactions handles a GetUserTransactions request.
 func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	userTransactions, err := api.AccountsDatabase.GetUserTransactions(ctx.UserValue("username").(string)) // Get user transactions
@@ -248,6 +255,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 // AuthenticateUser handles an AuthenticateUser request.
 func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Get account
@@ -270,6 +278,7 @@ func (api *JSONHTTPAPI) AuthenticateUser(ctx *fasthttp.RequestCtx) {
 // DeleteUser handles a DeleteUser request.
 func (api *JSONHTTPAPI) DeleteUser(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
 
 	err := api.AccountsDatabase.DeleteAccount(ctx.UserValue("username").(string), string(common.GetCtxValue(ctx, "password"))) // Delete account
