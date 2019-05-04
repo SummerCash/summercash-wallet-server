@@ -35,15 +35,11 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 	var recipient summercashCommon.Address // Init recipient buffer
 	var err error                          // Init error buffer
 
-	fmt.Println("test")
-
 	if string(common.GetCtxValue(ctx, "username")) == "faucet" { // Check wants to send from faucet
 		logger.Errorf("user with address %s tried to send tx from faucet account", ctx.RemoteAddr().String()) // Log error
 
 		panic(errors.New("cannot send transaction from faucet wallet")) // Panic
 	}
-
-	fmt.Println("test")
 
 	if !strings.Contains(string(common.GetCtxValue(ctx, "recipient")), "0x") { // Check is sending to username
 		recipientAccount, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "recipient"))) // Query account
@@ -65,8 +61,6 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		}
 	}
 
-	fmt.Println(string(common.GetCtxValue(ctx, "amount")))
-
 	amount, err := strconv.ParseFloat(string(common.GetCtxValue(ctx, "amount")), 64) // Parse amount
 
 	if err != nil { // Check for errors
@@ -75,8 +69,6 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	fmt.Println("test")
-
 	transaction, err := transactions.NewTransaction(api.AccountsDatabase, string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password")), &recipient, amount, common.GetCtxValue(ctx, "payload")) // Initialize transaction
 
 	if err != nil { // Check for errors
@@ -84,8 +76,6 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 
 		panic(err) // Panic
 	}
-
-	fmt.Println("test")
 
 	fmt.Fprintf(ctx, transaction.String()) // Write tx string value
 }
