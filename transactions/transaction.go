@@ -4,7 +4,6 @@ package transactions
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
@@ -14,6 +13,7 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 
 	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
+	summercashCommon "github.com/SummerCash/go-summercash/common"
 
 	transactionProto "github.com/SummerCash/go-summercash/intrnl/rpc/proto/transaction"
 	transactionServer "github.com/SummerCash/go-summercash/intrnl/rpc/transaction"
@@ -23,6 +23,8 @@ import (
 
 // NewTransaction creates, signs, and publishes a new transaction from a given user to a given address.
 func NewTransaction(accountsDB *accounts.DB, username string, password string, recipientAddress *common.Address, amount float64, payload []byte) (*types.Transaction, error) {
+	summercashCommon.DataDir = common.DataDir // Set data dir
+
 	account, err := accountsDB.QueryAccountByUsername(username) // Query account
 
 	if err != nil { // Check for errors
@@ -64,9 +66,6 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
-
-	fmt.Println(summercashAccount != nil)
-	fmt.Println(summercashAccount.PrivateKey.PublicKey.Curve != nil)
 
 	config, err := config.ReadChainConfigFromMemory() // Read config from memory
 
