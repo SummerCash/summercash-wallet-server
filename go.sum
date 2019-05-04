@@ -9,8 +9,8 @@ github.com/NebulousLabs/go-upnp v0.0.0-20181203152547-b32978b8ccbf h1:1UP+tqdgLA
 github.com/NebulousLabs/go-upnp v0.0.0-20181203152547-b32978b8ccbf/go.mod h1:GbuBk21JqF+driLX3XtJYNZjGa45YDoa9IqCTzNSfEc=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
-github.com/SummerCash/go-summercash v0.6.91 h1:odCW7xaXbcEgKJ/Mdug+VQRPASXqCUVLQ7epwXLMMb4=
-github.com/SummerCash/go-summercash v0.6.91/go.mod h1:AYBrhXUamq5du35Bvxw4dyOECCoqS+zIHuXNmNXaTgo=
+github.com/SummerCash/go-summercash v0.6.92 h1:BmVEv5YATOzPWegnsvZcOYAO+TBpT4nXq60S14WSzDs=
+github.com/SummerCash/go-summercash v0.6.92/go.mod h1:AYBrhXUamq5du35Bvxw4dyOECCoqS+zIHuXNmNXaTgo=
 github.com/SummerCash/ursa v0.0.0-20190308180320-f0a1fc97afcf h1:bj9I0RCoGn83J6E7JMyb2jiWuI8QBMVoz6Ay3qA6FXE=
 github.com/SummerCash/ursa v0.0.0-20190308180320-f0a1fc97afcf/go.mod h1:7jXdThbjRoksI1dmAO3ZiEMUFqmRmCp4y03BiMA1yLM=
 github.com/SummerCash/wagon v0.4.0 h1:jxjRC3tDkbwi8loj7aAeGCa/DSBaTthkCSl69kQqGS4=
