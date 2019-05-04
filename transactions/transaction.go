@@ -102,13 +102,21 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 
 	publishCtx, cancel := context.WithCancel(context.Background()) // Get ctx
 
+	fmt.Println("test")
+
 	defer cancel() // Cancel
 
+	fmt.Println("test")
+
 	_, err = rpcServer.Publish(publishCtx, &transactionProto.GeneralRequest{Address: transaction.Hash.String()}) // Publish
+
+	fmt.Println("test")
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
+
+	fmt.Println("test")
 
 	return transaction, nil // Return tx
 }
