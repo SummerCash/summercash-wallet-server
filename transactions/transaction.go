@@ -4,6 +4,7 @@ package transactions
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
@@ -63,6 +64,9 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
+
+	fmt.Println(summercashAccount != nil)
+	fmt.Println(summercashAccount.PrivateKey.PublicKey.Curve != nil)
 
 	config, err := config.ReadChainConfigFromMemory() // Read config from memory
 
