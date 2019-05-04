@@ -4,7 +4,6 @@ package transactions
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
@@ -94,29 +93,17 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println("test")
-
 	rpcServer := new(transactionServer.Server) // Initialize mock RPC server
-
-	fmt.Println("test")
 
 	publishCtx, cancel := context.WithCancel(context.Background()) // Get ctx
 
-	fmt.Println("test")
-
 	defer cancel() // Cancel
 
-	fmt.Println("test")
-
 	_, err = rpcServer.Publish(publishCtx, &transactionProto.GeneralRequest{Address: transaction.Hash.String()}) // Publish
-
-	fmt.Println("test")
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
-
-	fmt.Println("test")
 
 	return transaction, nil // Return tx
 }

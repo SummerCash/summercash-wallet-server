@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"runtime/debug"
 
 	"github.com/buaazp/fasthttprouter"
 	"github.com/juju/loggo"
@@ -144,6 +145,8 @@ func (api *JSONHTTPAPI) HandlePanic(ctx *fasthttp.RequestCtx, panic interface{})
 	errorInstance := &errorResponse{
 		Error: panic.(error).Error(), // Set error
 	}
+
+	fmt.Println(debug.Stack())
 
 	fmt.Fprintf(ctx, errorInstance.string()) // Log error
 }
