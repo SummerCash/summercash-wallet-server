@@ -68,8 +68,6 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println(summercashAccount)
-	fmt.Println(summercashAccount.PrivateKey.PublicKey)
 	fmt.Println(summercashAccount.PrivateKey.Curve)
 
 	config, err := config.ReadChainConfigFromMemory() // Read config from memory
@@ -85,6 +83,8 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
+
+	fmt.Println(summercashAccount.PrivateKey.Curve)
 
 	err = validator.ValidateTransaction(transaction) // Validate transaction
 
