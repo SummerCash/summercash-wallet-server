@@ -68,8 +68,6 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println(summercashAccount.PrivateKey.Curve)
-
 	config, err := config.ReadChainConfigFromMemory() // Read config from memory
 
 	if err != nil { // Check for errors
@@ -90,7 +88,13 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println(summercashAccount.PrivateKey.Curve)
+	err = transaction.MakeEncodingSafe() // Test
+
+	if err != nil { // Check for errors
+		return &types.Transaction{}, err // Return found error
+	}
+
+	fmt.Println("test")
 
 	err = transaction.WriteToMemory() // Write tx to mempool
 
