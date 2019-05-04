@@ -70,6 +70,7 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 
 	fmt.Println(summercashAccount)
 	fmt.Println(summercashAccount.PrivateKey.PublicKey)
+	fmt.Println(summercashAccount.PrivateKey.Curve)
 
 	config, err := config.ReadChainConfigFromMemory() // Read config from memory
 
