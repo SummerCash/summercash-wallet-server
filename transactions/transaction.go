@@ -84,13 +84,13 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println(summercashAccount.PrivateKey.Curve)
-
 	err = validator.ValidateTransaction(transaction) // Validate transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
+
+	fmt.Println(summercashAccount.PrivateKey.Curve)
 
 	err = transaction.WriteToMemory() // Write tx to mempool
 
