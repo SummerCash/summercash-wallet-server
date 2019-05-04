@@ -95,8 +95,11 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 	}
 
 	fmt.Println("test")
+	fmt.Println("test")
 
 	rpcServer := &transactionServer.Server{} // Initialize mock RPC server
+
+	fmt.Println("test")
 
 	publishCtx, cancel := context.WithCancel(context.Background()) // Get ctx
 
