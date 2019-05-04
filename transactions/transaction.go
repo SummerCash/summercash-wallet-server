@@ -88,19 +88,13 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	err = transaction.MakeEncodingSafe() // Test
+	err = transaction.WriteToMemory() // Write tx to mempool
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
 
 	fmt.Println("test")
-
-	err = transaction.WriteToMemory() // Write tx to mempool
-
-	if err != nil { // Check for errors
-		return &types.Transaction{}, err // Return found error
-	}
 
 	rpcServer := &transactionServer.Server{} // Initialize mock RPC server
 
