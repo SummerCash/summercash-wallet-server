@@ -65,8 +65,6 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		}
 	}
 
-	fmt.Println("test")
-
 	fmt.Println(string(common.GetCtxValue(ctx, "amount")))
 
 	amount, err := strconv.ParseFloat(string(common.GetCtxValue(ctx, "amount")), 64) // Parse amount
