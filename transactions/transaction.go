@@ -4,7 +4,6 @@ package transactions
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/big"
 
 	"github.com/SummerCash/go-summercash/common"
@@ -43,8 +42,6 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		}
 	}
 
-	fmt.Println("test")
-
 	var parentTransaction *types.Transaction // Init parent tx buffer
 
 	targetNonce := uint64(0.0) // Init target nonce
@@ -54,8 +51,6 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 
 		targetNonce = accountChain.CalculateTargetNonce() // Set nonce
 	}
-
-	fmt.Println("test")
 
 	transaction, err := types.NewTransaction(targetNonce, parentTransaction, &account.Address, recipientAddress, big.NewFloat(amount), payload) // Initialize transaction
 
@@ -69,15 +64,11 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println("test")
-
 	config, err := config.ReadChainConfigFromMemory() // Read config from memory
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
-
-	fmt.Println("test")
 
 	validator := validator.Validator(validator.NewStandardValidator(config)) // Initialize validator
 
@@ -87,23 +78,11 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 		return &types.Transaction{}, err // Return found error
 	}
 
-	fmt.Println("test")
-
 	err = validator.ValidateTransaction(transaction) // Validate transaction
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
 	}
-
-	fmt.Println("test")
-
-	err = transaction.WriteToMemory() // Write tx to memory
-
-	if err != nil { // Check for errors
-		return &types.Transaction{}, err // Return found error
-	}
-
-	fmt.Println("test")
 
 	rpcServer := &transactionServer.Server{} // Initialize mock RPC server
 
