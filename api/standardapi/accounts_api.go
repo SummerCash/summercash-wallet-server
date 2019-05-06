@@ -148,7 +148,7 @@ func (api *JSONHTTPAPI) GetLastUserTxHash(ctx *fasthttp.RequestCtx) {
 	}
 
 	if len(accountChain.Transactions) == 0 { // Check no transactions
-		fmt.Fprintf(ctx, fmt.Sprintf("{%serror%s: %sno hashes%s}", `"`, `"`, `"`, `"`)) // Write temp response
+		fmt.Fprintf(ctx, `{"error": "no hashes"}`) // Write temp response
 
 		return // Return
 	}
