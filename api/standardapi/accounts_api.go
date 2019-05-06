@@ -98,7 +98,7 @@ func (api *JSONHTTPAPI) AuthenticateUserToken(ctx *fasthttp.RequestCtx) {
 
 		panic(errors.New("invalid token")) // Panic
 	default:
-		fmt.Fprintf(ctx, `{"message": "authenticated"}`) // Respond
+		fmt.Fprintf(ctx, `{"address": "%s"}`, account.Address.String()) // Respond
 	}
 }
 
