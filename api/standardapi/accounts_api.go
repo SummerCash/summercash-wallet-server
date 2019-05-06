@@ -108,6 +108,14 @@ func (api *JSONHTTPAPI) IssueAccountToken(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
 
+	user, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Get user
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling IssueToken request with username %s", ctx.UserValue("username")) // Log error
+
+		panic(err) // Panic
+	}
+
 	if !api.AccountsDatabase.Auth(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password"))) { // Check cannot auth
 		logger.Errorf("errored while handling IssueToken request with username %s", ctx.UserValue("username")) // Log error
 
@@ -122,7 +130,7 @@ func (api *JSONHTTPAPI) IssueAccountToken(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	fmt.Fprintf(ctx, `{"token": "`+token+`"}`) // Respond with token
+	fmt.Fprintf(ctx, fmt.Sprintf(`{"token": "%s", "address": "%s"}`, token, user.Address.String())) // Respond with token and user address
 }
 
 // GetLastUserTxHash handles a GetLastUserTxHash request.
