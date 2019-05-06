@@ -14,15 +14,14 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/boltdb/bolt"
+	"github.com/juju/loggo"
+
 	"github.com/SummerCash/go-summercash/accounts"
+	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/SummerCash/summercash-wallet-server/crypto"
-
-	summercashCommon "github.com/SummerCash/go-summercash/common"
-
-	"github.com/boltdb/bolt"
-	"github.com/juju/loggo"
 )
 
 var (
