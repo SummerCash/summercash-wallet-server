@@ -45,6 +45,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/:username/lastHash", accountsAPIRoot), api.GetLastUserTxHash)       // Set GetLastUserTxHash get
 	api.Router.GET(fmt.Sprintf("%s/resolve/:address", addressAPIRoot), api.ResolveAddress)             // Set ResolveAddress get
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
+	api.Router.POST(fmt.Sprintf("%s/:username/authenticatetoken", accountsAPIRoot), api.AuthenticateUserToken)   // Set AuthenticateUserToken post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                    // Set DeleteUser delete
 	api.Router.GET(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken) // Set IssueAccountToken get
 
@@ -73,6 +74,32 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with account string
+}
+
+// AuthenticateUserToken handles an AuthenticateUserToken request.
+func (api *JSONHTTPAPI) AuthenticateUserToken(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
+
+	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Get account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling AuthenticateUserToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	valid := api.AccountsDatabase.ValidateAccountToken(account, string(common.GetCtxValue(ctx, "token"))) // Auth
+
+	switch valid {
+	case false:
+		logger.Errorf("errored while handling AuthenticateUserToken request with username %s: %s", ctx.UserValue("username"), errors.New("invalid token")) // Log error
+
+		panic(errors.New("invalid token")) // Panic
+	default:
+		fmt.Fprintf(ctx, `{"message": "authenticated"}`) // Respond
+	}
 }
 
 // IssueAccountToken handles an IssueAccountToken request.
