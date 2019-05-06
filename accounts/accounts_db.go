@@ -311,7 +311,7 @@ func (db *DB) Auth(name string, password string) bool {
 		return false // Return not valid
 	}
 
-	return crypto.VerifySalted(account.PasswordHash, password) // Verify salt
+	return crypto.VerifySalted(account.PasswordHash, password) || db.ValidateAccountToken(account, password) // Verify salt / token
 }
 
 // DeleteAccount deletes an account from the working DB.
