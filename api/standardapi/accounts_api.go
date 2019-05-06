@@ -47,7 +47,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)           // Set AuthenticateUser post
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticatetoken", accountsAPIRoot), api.AuthenticateUserToken) // Set AuthenticateUserToken post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                            // Set DeleteUser delete
-	api.Router.GET(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken)                  // Set IssueAccountToken get
+	api.Router.POST(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken)                 // Set IssueAccountToken post
 
 	return nil // No error occurred, return nil
 }
