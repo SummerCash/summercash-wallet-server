@@ -7,6 +7,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	rand "crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
@@ -181,7 +182,7 @@ func (db *DB) IssueAccountToken(username, password string) (string, error) {
 		return "", err // Return found error
 	}
 
-	(*account).Tokens = append(account.Tokens, string(crypto.Sha3(append(token.X.Bytes(), token.Y.Bytes()...)))) // Add token to account
+	(*account).Tokens = append(account.Tokens, hex.EncodeToString(crypto.Sha3(append(token.X.Bytes(), token.Y.Bytes()...)))) // Add token to account
 
 	err = db.DB.Update(func(tx *bolt.Tx) error {
 		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
@@ -193,7 +194,7 @@ func (db *DB) IssueAccountToken(username, password string) (string, error) {
 		return "", err // Return found error
 	}
 
-	return string(crypto.Sha3(append(token.X.Bytes(), token.Y.Bytes()...))), nil // Return token
+	return hex.EncodeToString(crypto.Sha3(append(token.X.Bytes(), token.Y.Bytes()...))), nil // Return token
 }
 
 // ValidateAccountToken checks whether or not a given token is valid.
