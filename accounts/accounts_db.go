@@ -164,6 +164,50 @@ func (db *DB) AddNewAccount(name string, password string, address string) (*Acco
 	return account, nil // Return address
 }
 
+// IssueAccountToken issues a new account token.
+func (db *DB) IssueAccountToken(username, password string) (string, error) {
+	account, err := db.QueryAccountByUsername(username) // Query account
+
+	if err != nil { // Check for errors
+		return "", err // Return found error
+	}
+
+	if !db.Auth(username, password) { // Check should not issue token
+		return "", ErrPasswordInvalid // Invalid
+	}
+
+	token, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader) // Generate key
+
+	if err != nil { // Check for errors
+		return "", err // Return found error
+	}
+
+	(*account).Tokens = append(account.Tokens, string(crypto.Sha3(append(token.X.Bytes(), token.Y.Bytes()...)))) // Add token to account
+
+	err = db.DB.Update(func(tx *bolt.Tx) error {
+		accountsBucket := tx.Bucket(accountsBucket) // Get accounts bucket
+
+		return accountsBucket.Put(crypto.Sha3([]byte(account.Name)), account.Bytes()) // Update account
+	})
+
+	if err != nil { // Check for errors
+		return "", err // Return found error
+	}
+
+	return string(crypto.Sha3(append(token.X.Bytes(), token.Y.Bytes()...))), nil // Return token
+}
+
+// ValidateAccountToken checks whether or not a given token is valid.
+func (db *DB) ValidateAccountToken(account *Account, token string) bool {
+	for _, currentToken := range account.Tokens { // Iterate through account tokens
+		if currentToken == token { // Check token matches
+			return true // Valid
+		}
+	}
+
+	return false // Invalid token
+}
+
 // MakeFaucetClaim makes a faucet claim for a given account.
 func (db *DB) MakeFaucetClaim(account *Account, amount *big.Float) error {
 	err := db.CreateAccountsBucketIfNotExist() // Create accounts bucket
