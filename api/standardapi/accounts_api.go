@@ -46,6 +46,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.GET(fmt.Sprintf("%s/resolve/:address", addressAPIRoot), api.ResolveAddress)             // Set ResolveAddress get
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticate", accountsAPIRoot), api.AuthenticateUser)   // Set AuthenticateUser post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                    // Set DeleteUser delete
+	api.Router.GET(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken) // Set IssueAccountToken get
 
 	return nil // No error occurred, return nil
 }
@@ -72,6 +73,29 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with account string
+}
+
+// IssueAccountToken handles an IssueAccountToken request.
+func (api *JSONHTTPAPI) IssueAccountToken(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*") // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json") // Set content type
+
+	if !api.AccountsDatabase.Auth(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password"))) { // Check cannot auth
+		logger.Errorf("errored while handling IssueToken request with username %s", ctx.UserValue("username")) // Log error
+
+		panic(errors.New("invalid username or password")) // panic
+	}
+
+	token, err := api.AccountsDatabase.IssueAccountToken(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password"))) // Issue token
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling IssueToken request with username %s", ctx.UserValue("username")) // Log error
+
+		panic(err) // Panic
+	}
+
+	fmt.Fprintf(ctx, `{"token": "`+token+`"}`) // Respond with token
 }
 
 // GetLastUserTxHash handles a GetLastUserTxHash request.
