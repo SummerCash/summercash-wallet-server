@@ -171,8 +171,6 @@ func (api *JSONHTTPAPI) IssueAccountToken(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	fmt.Println(fmt.Sprintf(`{"token": "%s", "address": "%s"}`, token, user.Address.String()))
-
 	fmt.Fprintf(ctx, fmt.Sprintf(`{"token": "%s", "address": "%s"}`, token, user.Address.String())) // Respond with token and user address
 }
 
