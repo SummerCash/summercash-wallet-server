@@ -3,6 +3,7 @@ module github.com/SummerCash/summercash-wallet-server
 go 1.12
 
 require (
+	github.com/NaySoftware/go-fcm v0.0.0-20180207124314-28fff9381d17 // indirect
 	github.com/SummerCash/go-summercash v0.6.92
 	github.com/boltdb/bolt v1.3.1
 	github.com/btcsuite/btcd v0.0.0-20190427004231-96897255fd17 // indirect
