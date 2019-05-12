@@ -4,15 +4,16 @@ package standardapi
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
-	"github.com/SummerCash/summercash-wallet-server/common"
-	"github.com/SummerCash/summercash-wallet-server/transactions"
-
+	"github.com/NaySoftware/go-fcm"
 	"github.com/valyala/fasthttp"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
+	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/transactions"
 )
 
 /* BEGIN EXPORTED METHODS */
@@ -75,6 +76,33 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
 
 		panic(err) // Panic
+	}
+
+	if !strings.Contains(string(common.GetCtxValue(ctx, "recipient")), "0x") && os.Getenv("FCM_KEY") != "" { // Check is username recipient
+		recipientAccount, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "recipient"))) // Query account
+
+		if err != nil { // Check for errors
+			logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+
+			panic(err) // Panic
+		}
+
+		amount, _ := transaction.Amount.Float64() // Get tx amount
+
+		data := map[string]string{
+			"msg": "New Transaction",
+			"sum": fmt.Sprintf("Received %f SMC from %s.", amount, transaction.Sender.String()),
+		}
+
+		client := fcm.NewFcmClient(os.Getenv("FCM_KEY")) // Init client
+
+		client.NewFcmRegIdsMsg(recipientAccount.FcmTokens, data) // Init message
+
+		_, err = client.Send() // Send notification
+
+		if err != nil { // Check for errors
+			logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+		}
 	}
 
 	fmt.Fprintf(ctx, transaction.String()) // Write tx string value
