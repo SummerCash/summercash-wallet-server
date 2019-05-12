@@ -15,6 +15,7 @@ import (
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
 	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/crypto"
 )
 
 // calcBalanceResponse represents a response to a CalcBalance request.
@@ -104,7 +105,7 @@ func (api *JSONHTTPAPI) SetAccountPushToken(ctx *fasthttp.RequestCtx) {
 	(*account).FcmTokens = append((*account).FcmTokens, string(common.GetCtxValue(ctx, "fcm_token"))) // Append fcm token
 
 	err = api.AccountsDatabase.DB.Update(func(tx *bolt.Tx) error {
-		return tx.Bucket([]byte("accounts")).Put([]byte(common.GetCtxValue(ctx, "username")), account.Bytes()) // Put new value
+		return tx.Bucket([]byte("accounts")).Put(crypto.Sha3([]byte(common.GetCtxValue(ctx, "username"))), account.Bytes()) // Put new value
 	})
 
 	if err != nil { // Check for errors
