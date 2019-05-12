@@ -22,7 +22,8 @@ type Account struct {
 	LastFaucetClaimTime   time.Time  `json:"last_claim_time"`   // Last claim time
 	LastFaucetClaimAmount *big.Float `json:"last_claim_amount"` // Last claim amount
 
-	Tokens []string `json:"tokens"` // Account tokens
+	Tokens    []string `json:"tokens"`     // Account tokens
+	FcmTokens []string `json:"fcm_tokens"` // Account Firebase Cloud Messaging tokens
 }
 
 // jsonAccount represents a JSON-friendly account.
