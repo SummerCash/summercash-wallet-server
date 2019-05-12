@@ -9,6 +9,8 @@ import (
 
 	"github.com/valyala/fasthttp"
 
+	"github.com/boltdb/bolt"
+
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -48,6 +50,7 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.POST(fmt.Sprintf("%s/:username/authenticatetoken", accountsAPIRoot), api.AuthenticateUserToken) // Set AuthenticateUserToken post
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                            // Set DeleteUser delete
 	api.Router.POST(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken)                 // Set IssueAccountToken post
+	api.Router.POST(fmt.Sprintf("%s/:username/pushtoken", accountsAPIRoot), api.SetAccountPushToken)           // Set AccountPushToken
 
 	return nil // No error occurred, return nil
 }
@@ -74,6 +77,43 @@ func (api *JSONHTTPAPI) NewAccount(ctx *fasthttp.RequestCtx) {
 	}
 
 	fmt.Fprintf(ctx, account.String()) // Respond with account string
+}
+
+// SetAccountPushToken handles a SetAccountPushToken request.
+func (api *JSONHTTPAPI) SetAccountPushToken(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
+
+	account, err := api.AccountsDatabase.QueryAccountByUsername(string(common.GetCtxValue(ctx, "username"))) // Query account
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling SetAccountPushToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	if !api.AccountsDatabase.Auth(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "password"))) { // Check not valid auth
+		err = errors.New("invalid token") // Set error
+
+		logger.Errorf("errored while handling SetAccountPushToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	(*account).FcmTokens = append((*account).FcmTokens, string(common.GetCtxValue(ctx, "fcm_token"))) // Append fcm token
+
+	err = api.AccountsDatabase.DB.Update(func(tx *bolt.Tx) error {
+		return tx.Bucket([]byte("accounts")).Put([]byte(common.GetCtxValue(ctx, "username")), account.Bytes()) // Put new value
+	})
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling SetAccountPushToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	fmt.Fprintf(ctx, `{"message": "success"}`) // Respond with success
 }
 
 // AuthenticateUserToken handles an AuthenticateUserToken request.
