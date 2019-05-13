@@ -101,6 +101,16 @@ func (api *JSONHTTPAPI) SetAccountPushToken(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
+	for _, token := range (*account).FcmTokens { // Iterate through account tokens
+		if token == string(common.GetCtxValue(ctx, "fcm_token")) { // Check token already exists
+			err = errors.New("token already exists") // Set error
+
+			logger.Errorf("errored while handling SetAccountPushToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+			panic(err) // Panic
+		}
+	}
+
 	(*account).FcmTokens = append((*account).FcmTokens, string(common.GetCtxValue(ctx, "fcm_token"))) // Append fcm token
 
 	err = api.AccountsDatabase.DB.Update(func(tx *bolt.Tx) error {
