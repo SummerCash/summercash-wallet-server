@@ -103,8 +103,6 @@ func (api *JSONHTTPAPI) SetAccountPushToken(ctx *fasthttp.RequestCtx) {
 
 	(*account).FcmTokens = append((*account).FcmTokens, string(common.GetCtxValue(ctx, "fcm_token"))) // Append fcm token
 
-	fmt.Println((*account).FcmTokens)
-
 	err = api.AccountsDatabase.DB.Update(func(tx *bolt.Tx) error {
 		return tx.Bucket([]byte("accounts")).Put(crypto.Sha3([]byte(common.GetCtxValue(ctx, "username"))), account.Bytes()) // Put new value
 	})
