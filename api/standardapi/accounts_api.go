@@ -7,9 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/valyala/fasthttp"
-
 	"github.com/boltdb/bolt"
+	"github.com/valyala/fasthttp"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
@@ -101,6 +100,8 @@ func (api *JSONHTTPAPI) SetAccountPushToken(ctx *fasthttp.RequestCtx) {
 
 		panic(err) // Panic
 	}
+
+	fmt.Println(string(common.GetCtxValue(ctx, "username")), string(common.GetCtxValue(ctx, "fcm_token"))) // Log post details
 
 	(*account).FcmTokens = append((*account).FcmTokens, string(common.GetCtxValue(ctx, "fcm_token"))) // Append fcm token
 
