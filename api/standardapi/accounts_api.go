@@ -7,9 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/valyala/fasthttp"
-
 	"github.com/boltdb/bolt"
+	"github.com/valyala/fasthttp"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
@@ -100,6 +99,16 @@ func (api *JSONHTTPAPI) SetAccountPushToken(ctx *fasthttp.RequestCtx) {
 		logger.Errorf("errored while handling SetAccountPushToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
 
 		panic(err) // Panic
+	}
+
+	for _, token := range (*account).FcmTokens { // Iterate through account tokens
+		if token == string(common.GetCtxValue(ctx, "fcm_token")) { // Check token already exists
+			err = errors.New("token already exists") // Set error
+
+			logger.Errorf("errored while handling SetAccountPushToken request with username %s: %s", ctx.UserValue("username"), err.Error()) // Log error
+
+			panic(err) // Panic
+		}
 	}
 
 	(*account).FcmTokens = append((*account).FcmTokens, string(common.GetCtxValue(ctx, "fcm_token"))) // Append fcm token
