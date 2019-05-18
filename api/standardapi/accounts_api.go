@@ -292,7 +292,7 @@ func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 			return nil
 		}) // View bucket
 
-		fmt.Fprintf(ctx, strings.Join(users, ", ")) // Write users
+		fmt.Fprintf(ctx, fmt.Sprintf(`{[%s]}`, strings.Join(users, ", "))) // Write users
 
 		return // Stop execution
 	}
