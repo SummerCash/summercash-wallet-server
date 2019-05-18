@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -269,6 +270,32 @@ func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
 	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
+
+	if ctx.UserValue("username").(string) == "everyone" { // Check is @everyone
+		var users []string // Initialize users buffer
+
+		api.AccountsDatabase.DB.View(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte("accounts")) // Get accounts bucket
+
+			c := b.Cursor() // Initialize cursor
+
+			for k, v := c.First(); k != nil; k, v = c.Next() { // Iterate through keys
+				account, err := accounts.AccountFromBytes(v) // Resolve user
+
+				if err != nil { // Check for errors
+					continue // Continue
+				}
+
+				users = append(users, account.String()) // Append user
+			}
+
+			return nil
+		}) // View bucket
+
+		fmt.Fprintf(ctx, strings.Join(users, ", ")) // Write users
+
+		return // Stop execution
+	}
 
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Query account
 
