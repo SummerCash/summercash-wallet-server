@@ -6,15 +6,15 @@ import (
 	"errors"
 	"math/big"
 
+	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
 	"github.com/SummerCash/go-summercash/common"
+	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/config"
+	transactionProto "github.com/SummerCash/go-summercash/intrnl/rpc/proto/transaction"
+	transactionServer "github.com/SummerCash/go-summercash/intrnl/rpc/transaction"
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/go-summercash/validator"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
-	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
-	summercashCommon "github.com/SummerCash/go-summercash/common"
-	transactionProto "github.com/SummerCash/go-summercash/intrnl/rpc/proto/transaction"
-	transactionServer "github.com/SummerCash/go-summercash/intrnl/rpc/transaction"
 )
 
 /* BEGIN EXPORTED METHODS */
@@ -86,24 +86,6 @@ func NewTransaction(accountsDB *accounts.DB, username string, password string, r
 	}
 
 	err = transaction.WriteToMemory() // Write tx to mempool
-
-	if err != nil { // Check for errors
-		return &types.Transaction{}, err // Return found error
-	}
-
-	recipientChain, err := types.ReadChainFromMemory(*recipientAddress) // Read recipient chain from persistent memory
-
-	if err != nil { // Check for errors
-		return &types.Transaction{}, err // Return found error
-	}
-
-	err = accountChain.AddTransaction(transaction) // Add transaction to account chain directly
-
-	if err != nil { // Check for errors
-		return &types.Transaction{}, err // Return found error
-	}
-
-	err = recipientChain.AddTransaction(transaction) // Add transaction to recipient chain
 
 	if err != nil { // Check for errors
 		return &types.Transaction{}, err // Return found error
