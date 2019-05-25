@@ -19,6 +19,6 @@ require (
 	github.com/multiformats/go-multihash v0.0.5 // indirect
 	github.com/valyala/fasthttp v1.2.0
 	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734
-	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0 // indirect
+	golang.org/x/oauth2 v0.0.0-20190523182746-aaccbc9213b0
 	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
 )
