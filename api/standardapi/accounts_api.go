@@ -95,6 +95,10 @@ func (api *JSONHTTPAPI) OauthLogin(ctx *fasthttp.RequestCtx) {
 
 // OauthCallback handles an OauthCallback request.
 func (api *JSONHTTPAPI) OauthCallback(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
+
 	oauthState := ctx.Request.Header.Cookie("oauthstate") // Get cookie
 
 	if !bytes.Equal(common.GetCtxValue(ctx, "state"), oauthState) { // Check invalid state
