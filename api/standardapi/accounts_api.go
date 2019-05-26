@@ -61,6 +61,7 @@ type authenticateUserResponse struct {
 func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	accountsAPIRoot := "/api/accounts" // Get accounts API root path
 	addressAPIRoot := "/api/addresses" // Get addresses API root path
+	oauthAPIRoot := "/api/oauth"       // Get oauth API root path
 
 	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount)                              // Set NewAccount post
 	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword)                      // Set ResetAccountPassword put
@@ -74,8 +75,8 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                            // Set DeleteUser delete
 	api.Router.POST(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken)                 // Set IssueAccountToken post
 	api.Router.POST(fmt.Sprintf("%s/:username/pushtoken", accountsAPIRoot), api.SetAccountPushToken)           // Set AccountPushToken
-	api.Router.POST(fmt.Sprintf("%s/oauth/login", accountsAPIRoot), api.OauthLogin)                            // Set Authorize post
-	api.Router.POST(fmt.Sprintf("%s/oauth/callback", accountsAPIRoot), api.OauthCallback)                      // Set Oauth post
+	api.Router.POST(fmt.Sprintf("%s/oauth/login", oauthAPIRoot), api.OauthLogin)                               // Set Authorize post
+	api.Router.POST(fmt.Sprintf("%s/oauth/callback", oauthAPIRoot), api.OauthCallback)                         // Set Oauth post
 
 	return nil // No error occurred, return nil
 }
