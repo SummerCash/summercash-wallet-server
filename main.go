@@ -15,15 +15,15 @@ import (
 	"github.com/juju/loggo"
 	"github.com/juju/loggo/loggocolor"
 
-	"github.com/SummerCash/summercash-wallet-server/accounts"
-	"github.com/SummerCash/summercash-wallet-server/api/standardapi"
-	"github.com/SummerCash/summercash-wallet-server/common"
-	"github.com/SummerCash/summercash-wallet-server/faucet"
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/config"
 	"github.com/SummerCash/go-summercash/p2p"
 	"github.com/SummerCash/go-summercash/rpc"
 	"github.com/SummerCash/go-summercash/validator"
+	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/api/standardapi"
+	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/faucet"
 )
 
 var (
@@ -66,6 +66,7 @@ func main() {
 	}
 
 	if !*useRemoteNodeFlag { // Check must use local node
+		fmt.Println("test")
 		err = startNode() // Start node
 
 		if err != nil { // Check for errors
@@ -74,6 +75,8 @@ func main() {
 			os.Exit(1) // Return
 		}
 	}
+
+	fmt.Println("test2")
 
 	err = startServingStandardHTTPJSONAPI() // Start serving
 
