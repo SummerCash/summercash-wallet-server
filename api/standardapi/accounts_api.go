@@ -427,7 +427,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 			Amount:                  floatVal,                                                                   // Set amount
 			Payload:                 transaction.Payload,                                                        // Set payload
 			Signature:               transaction.Signature,                                                      // Set signature
-			ParentTx:                transaction.ParentTx,                                                       // Set parent
+			ParentTx:                transaction.ParentTx.String(),                                              // Set parent
 			Timestamp:               transaction.Timestamp.Add(-4 * time.Hour).Format("01/02/2006 03:04:05 PM"), // Set timestamp
 			DeployedContractAddress: transaction.DeployedContractAddress,                                        // Set deployed contract address
 			ContractCreation:        transaction.ContractCreation,                                               // Set is contract creation

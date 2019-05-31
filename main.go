@@ -12,17 +12,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/SummerCash/summercash-wallet-server/accounts"
-	"github.com/SummerCash/summercash-wallet-server/api/standardapi"
-
-	"github.com/SummerCash/summercash-wallet-server/common"
-	"github.com/SummerCash/summercash-wallet-server/faucet"
-
-	summercashCommon "github.com/SummerCash/go-summercash/common"
-
 	"github.com/juju/loggo"
 	"github.com/juju/loggo/loggocolor"
 
+	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/api/standardapi"
+	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/faucet"
+	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/config"
 	"github.com/SummerCash/go-summercash/p2p"
 	"github.com/SummerCash/go-summercash/rpc"
@@ -115,7 +112,7 @@ func startSummercashRPCServer() error {
 
 // startNode starts a new go-summercash node.
 func startNode() error {
-	host, err := p2p.NewHost(ctx, *nodePortFlag) // Initialize libp2p host with context and nat manager
+	host, err := p2p.NewHost(ctx, *nodePortFlag, "main_net") // Initialize libp2p host with context and nat manager
 
 	if err != nil { // Check for errors
 		panic(err) // Panic
