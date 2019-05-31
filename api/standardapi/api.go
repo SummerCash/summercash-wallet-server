@@ -146,6 +146,7 @@ func (api *JSONHTTPAPI) HandlePanic(ctx *fasthttp.RequestCtx, panic interface{})
 	}
 
 	fmt.Fprintf(ctx, errorInstance.string()) // Log error
+	fmt.Println(panic.(error).Error()) // Log error
 }
 
 /* END EXPORTED METHODS */
