@@ -2,13 +2,23 @@
 package standardapi
 
 import (
+	"bytes"
+	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/valyala/fasthttp"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
@@ -16,6 +26,19 @@ import (
 	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/SummerCash/summercash-wallet-server/crypto"
 )
+
+var (
+	// config - default config.
+	config = oauth2.Config{
+		ClientID:     os.Getenv("OAUTH_CLIENT_ID"),
+		ClientSecret: os.Getenv("OAUTH_CLIENT_SECRET"),
+		Scopes:       []string{"all"},
+		Endpoint:     google.Endpoint,
+		RedirectURL:  "https://localhost/accounts/oauth/callback",
+	}
+)
+
+const oauthGoogleURLAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
 
 // calcBalanceResponse represents a response to a CalcBalance request.
 type calcBalanceResponse struct {
@@ -38,6 +61,7 @@ type authenticateUserResponse struct {
 func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	accountsAPIRoot := "/api/accounts" // Get accounts API root path
 	addressAPIRoot := "/api/addresses" // Get addresses API root path
+	oauthAPIRoot := "/api/oauth"       // Get oauth API root path
 
 	api.Router.POST(fmt.Sprintf("%s/:username", accountsAPIRoot), api.NewAccount)                              // Set NewAccount post
 	api.Router.PUT(fmt.Sprintf("%s/:username", accountsAPIRoot), api.RestAccountPassword)                      // Set ResetAccountPassword put
@@ -51,8 +75,43 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.DELETE(fmt.Sprintf("%s/:username", accountsAPIRoot), api.DeleteUser)                            // Set DeleteUser delete
 	api.Router.POST(fmt.Sprintf("%s/:username/token", accountsAPIRoot), api.IssueAccountToken)                 // Set IssueAccountToken post
 	api.Router.POST(fmt.Sprintf("%s/:username/pushtoken", accountsAPIRoot), api.SetAccountPushToken)           // Set AccountPushToken
+	api.Router.POST(fmt.Sprintf("%s/oauth/login", oauthAPIRoot), api.OauthLogin)                               // Set Authorize post
+	api.Router.POST(fmt.Sprintf("%s/oauth/callback", oauthAPIRoot), api.OauthCallback)                         // Set Oauth post
 
 	return nil // No error occurred, return nil
+}
+
+// OauthLogin handles an OauthLogin request.
+func (api *JSONHTTPAPI) OauthLogin(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
+
+	oauthState := generateStateOauthCookie(ctx) // Generate state cookie
+	u := config.AuthCodeURL(oauthState)         // Get auth URL
+
+	ctx.Redirect(u, http.StatusTemporaryRedirect) // Redirect
+}
+
+// OauthCallback handles an OauthCallback request.
+func (api *JSONHTTPAPI) OauthCallback(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
+
+	oauthState := ctx.Request.Header.Cookie("oauthstate") // Get cookie
+
+	if !bytes.Equal(common.GetCtxValue(ctx, "state"), oauthState) { // Check invalid state
+		panic(errors.New("invalid oauth state")) // Return invalid state
+	}
+
+	data, err := getUserDataFromGoogle(string(common.GetCtxValue(ctx, "code"))) // Get user data
+
+	if err != nil { // Check for errors
+		panic(err) // Panic
+	}
+
+	fmt.Println(data) // Log user
 }
 
 // NewAccount handles a NewAccount request.
@@ -270,6 +329,32 @@ func (api *JSONHTTPAPI) QueryAccount(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
 
+	if ctx.UserValue("username").(string) == "everyone" { // Check is @everyone
+		var users []string // Initialize users buffer
+
+		api.AccountsDatabase.DB.View(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte("accounts")) // Get accounts bucket
+
+			c := b.Cursor() // Initialize cursor
+
+			for k, v := c.First(); k != nil; k, v = c.Next() { // Iterate through keys
+				account, err := accounts.AccountFromBytes(v) // Resolve user
+
+				if err != nil { // Check for errors
+					continue // Continue
+				}
+
+				users = append(users, account.String()) // Append user
+			}
+
+			return nil
+		}) // View bucket
+
+		fmt.Fprintf(ctx, fmt.Sprintf(`{"accounts": [%s]}`, strings.Join(users, ", "))) // Write users
+
+		return // Stop execution
+	}
+
 	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Query account
 
 	if err != nil { // Check for errors
@@ -342,7 +427,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 			Amount:                  floatVal,                                                                   // Set amount
 			Payload:                 transaction.Payload,                                                        // Set payload
 			Signature:               transaction.Signature,                                                      // Set signature
-			ParentTx:                transaction.ParentTx,                                                       // Set parent
+			ParentTx:                transaction.ParentTx.String(),                                              // Set parent
 			Timestamp:               transaction.Timestamp.Add(-4 * time.Hour).Format("01/02/2006 03:04:05 PM"), // Set timestamp
 			DeployedContractAddress: transaction.DeployedContractAddress,                                        // Set deployed contract address
 			ContractCreation:        transaction.ContractCreation,                                               // Set is contract creation
@@ -424,6 +509,44 @@ func (response *authenticateUserResponse) string() string {
 	marshaledval, _ := json.MarshalIndent(*response, "", "  ") // Marshal value
 
 	return string(marshaledval) // Return value
+}
+
+// generate a new state oauth cookie.
+func generateStateOauthCookie(ctx *fasthttp.RequestCtx) string {
+	b := make([]byte, 16) // Init buffer
+
+	rand.Read(b) // Read random
+
+	state := base64.URLEncoding.EncodeToString(b) // Encode to string
+
+	ctx.Request.Header.SetCookie("oauthstate", state) // Set state
+
+	return state // Return state
+}
+
+// Fetch, parse user data
+func getUserDataFromGoogle(code string) ([]byte, error) {
+	token, err := config.Exchange(context.Background(), code) // Request token
+
+	if err != nil { // Check for errors
+		return nil, fmt.Errorf("code exchange wrong: %s", err.Error()) // Return error
+	}
+
+	response, err := http.Get(oauthGoogleURLAPI + token.AccessToken) // Get details
+
+	if err != nil { // Check for errors
+		return nil, fmt.Errorf("failed getting user info: %s", err.Error()) // Return error
+	}
+
+	defer response.Body.Close() // Close response body
+
+	contents, err := ioutil.ReadAll(response.Body) // Read response body
+
+	if err != nil { // Check for errors
+		return nil, fmt.Errorf("failed read response: %s", err.Error()) // Return error
+	}
+
+	return contents, nil // Return user details
 }
 
 /* END INTERNAL METHODS */

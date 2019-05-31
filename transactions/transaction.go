@@ -6,17 +6,15 @@ import (
 	"errors"
 	"math/big"
 
+	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
 	"github.com/SummerCash/go-summercash/common"
+	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/config"
+	transactionProto "github.com/SummerCash/go-summercash/intrnl/rpc/proto/transaction"
+	transactionServer "github.com/SummerCash/go-summercash/intrnl/rpc/transaction"
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/go-summercash/validator"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
-
-	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
-	summercashCommon "github.com/SummerCash/go-summercash/common"
-
-	transactionProto "github.com/SummerCash/go-summercash/intrnl/rpc/proto/transaction"
-	transactionServer "github.com/SummerCash/go-summercash/intrnl/rpc/transaction"
 )
 
 /* BEGIN EXPORTED METHODS */
