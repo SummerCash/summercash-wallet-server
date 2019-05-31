@@ -66,7 +66,6 @@ func main() {
 	}
 
 	if !*useRemoteNodeFlag { // Check must use local node
-		fmt.Println("test")
 		err = startNode() // Start node
 
 		if err != nil { // Check for errors
@@ -75,8 +74,6 @@ func main() {
 			os.Exit(1) // Return
 		}
 	}
-
-	fmt.Println("test2")
 
 	err = startServingStandardHTTPJSONAPI() // Start serving
 
