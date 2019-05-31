@@ -420,6 +420,12 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 
 		floatVal, _ := transaction.Amount.Float64() // Get float value
 
+		parentString := "" // Init parent
+
+		if transaction.ParentTx != nil { // Check has parent
+			parentString = transaction.ParentTx.String() // Set parent
+		}
+
 		stringTransaction := &types.StringTransaction{
 			AccountNonce:            transaction.AccountNonce,                                                   // Set account nonce
 			SenderHex:               sender,                                                                     // Set sender hex
@@ -427,7 +433,7 @@ func (api *JSONHTTPAPI) GetUserTransactions(ctx *fasthttp.RequestCtx) {
 			Amount:                  floatVal,                                                                   // Set amount
 			Payload:                 transaction.Payload,                                                        // Set payload
 			Signature:               transaction.Signature,                                                      // Set signature
-			ParentTx:                transaction.ParentTx.String(),                                              // Set parent
+			ParentTx:                parentString,                                              // Set parent
 			Timestamp:               transaction.Timestamp.Add(-4 * time.Hour).Format("01/02/2006 03:04:05 PM"), // Set timestamp
 			DeployedContractAddress: transaction.DeployedContractAddress,                                        // Set deployed contract address
 			ContractCreation:        transaction.ContractCreation,                                               // Set is contract creation
