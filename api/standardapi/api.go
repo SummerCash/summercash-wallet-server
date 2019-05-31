@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/buaazp/fasthttprouter"
@@ -146,7 +147,8 @@ func (api *JSONHTTPAPI) HandlePanic(ctx *fasthttp.RequestCtx, panic interface{})
 	}
 
 	fmt.Fprintf(ctx, errorInstance.string()) // Log error
-	fmt.Println(panic.(error).Error()) // Log error
+	fmt.Println(panic.(error).Error())       // Log error
+	debug.PrintStack()                       // Print stack trace
 }
 
 /* END EXPORTED METHODS */
