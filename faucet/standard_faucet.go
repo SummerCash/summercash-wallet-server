@@ -131,10 +131,11 @@ func (faucet *StandardFaucet) Claim(account *accounts.Account, amount *big.Float
 
 	floatVal, _ := amount.Float64() // Get float value
 
+	fmt.Println(splitPassword[0] + splitPassword[1])
+
 	_, err = transactions.NewTransaction((*faucet).WorkingDB(), "faucet", string(splitPassword[0]+splitPassword[1]), &account.Address, floatVal, []byte("Faucet claim.")) // Initialize transaction
 
 	if err != nil { // Check for errors
-		fmt.Println("test")
 		return err // Return found error
 	}
 
