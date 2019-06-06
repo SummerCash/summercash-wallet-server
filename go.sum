@@ -55,6 +55,8 @@ github.com/dowlandaiello/go-simplesub v0.0.0-20190529165630-fbb1989a36a6/go.mod 
 github.com/dowlandaiello/go-simplesub v0.0.0-20190530171458-9d2a71eaf57f h1:Vqh+nW4JRPvYdFvCiDaaubjV9k0wFHG8GDaLVH5w1bc=
 github.com/dowlandaiello/go-simplesub v0.0.0-20190530171458-9d2a71eaf57f/go.mod h1:3NZsnn1tInRzchATPcxgWHaGQhiWw7x8pKvy8bC2TcI=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
+github.com/fasthttp/router v0.3.4 h1:/ZlR7DKG1UOAgwY5ChxLIr+QFzoJylXb2Kc0qoU7cgM=
+github.com/fasthttp/router v0.3.4/go.mod h1:Dox9pMCKygoMajltoDohsnHlP0iYFDDosirAN8TNr8U=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/structs v1.0.0 h1:BrX964Rv5uQ3wwS+KRUAJCBBw5PQmgJfJ6v4yly5QwU=
@@ -323,6 +325,8 @@ github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/savsgio/gotils v0.0.0-20190409142739-e36d23089e10 h1:Rk4AHSMs6BX9Vb84H+SmYEA3X/VrtLV9qYSU/lc7xk4=
+github.com/savsgio/gotils v0.0.0-20190409142739-e36d23089e10/go.mod h1:w803/Fg1m0hrp1ZT9KNfQe4E4+WOMMFLcgzPvOcye10=
 github.com/spacemonkeygo/openssl v0.0.0-20181017203307-c2dcc5cca94a/go.mod h1:7AyxJNCJ7SBZ1MfVQCWD6Uqo2oubI2Eq2y2eqf+A5r0=
 github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572/go.mod h1:w0SWMsp6j9O/dk4/ZpIhL+3CkG8ofA2vuv7k+ltqUMc=
 github.com/spaolacci/murmur3 v1.1.0 h1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0bLI=

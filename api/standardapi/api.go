@@ -9,7 +9,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/buaazp/fasthttprouter"
+	fasthttprouter "github.com/fasthttp/router"
 	"github.com/juju/loggo"
 	"github.com/valyala/fasthttp"
 
