@@ -5,14 +5,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/SummerCash/summercash-wallet-server/accounts"
-	"github.com/SummerCash/summercash-wallet-server/common"
-	"github.com/SummerCash/summercash-wallet-server/transactions"
 	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/SummerCash/summercash-wallet-server/accounts"
+	"github.com/SummerCash/summercash-wallet-server/common"
+	"github.com/SummerCash/summercash-wallet-server/transactions"
 )
 
 var (
@@ -54,7 +55,7 @@ func (faucet *StandardFaucet) AccountCanClaim(account *accounts.Account) bool {
 		return true // Has not claimed yet
 	}
 
-	if updatedAccount.LastFaucetClaimTime.Sub(time.Now()).Hours() < (*faucet.GetRuleset()).GetClaimPeriod().Hours() { // Check less than 24 hours since last claim
+	if time.Now().Sub(updatedAccount.LastFaucetClaimTime).Hours() < (*faucet.GetRuleset()).GetClaimPeriod().Hours() { // Check less than 24 hours since last claim
 		return false // Cannot claim
 	}
 
