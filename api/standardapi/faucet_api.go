@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SummerCash/summercash-wallet-server/common"
 	"github.com/valyala/fasthttp"
+
+	"github.com/SummerCash/summercash-wallet-server/common"
 )
 
 /* BEGIN EXPORTED METHODS */

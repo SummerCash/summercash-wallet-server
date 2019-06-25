@@ -10,6 +10,7 @@ import (
 
 	"github.com/NaySoftware/go-fcm"
 	"github.com/valyala/fasthttp"
+	"github.com/r3labs/sse"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/summercash-wallet-server/common"
@@ -97,6 +98,12 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		client := fcm.NewFcmClient(os.Getenv("FCM_KEY")) // Init client
 
 		client.NewFcmRegIdsMsg(recipientAccount.FcmTokens, data) // Init message
+
+		if api.EventServer != nil { // Check has event server
+			api.EventServer.Publish(fmt.Sprintf("%s_transactions", recipientAccount.Name), &sse.Event{
+				Data: []byte(transaction.String()),
+			}) // Publish new tx
+		}
 
 		_, err = client.Send() // Send notification
 

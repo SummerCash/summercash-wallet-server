@@ -35,6 +35,7 @@ var (
 	dataDirFlag       = flag.String("data-dir", common.DataDir, "starts node with given data directory")            // Init data dir flag
 	faucetRewardFlag  = flag.Float64("faucet-reward", 0.00001, "starts faucet api with a given reward amount")      // Init faucet reward flag
 	useRemoteNodeFlag = flag.Bool("use-remote-node", false, "skips node start, assumes remote node is up to date")  // Init remote node flag
+	useEventStream    = flag.Bool("use-eventstream", false, "uses event streams for the API")                       // Init use eventstream flag
 
 	logger = loggo.GetLogger("") // Get logger
 
@@ -191,7 +192,7 @@ func startServingStandardHTTPJSONAPI() error {
 
 	abstractFaucet := faucet.Faucet(standardFaucet) // Get interface
 
-	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf(":%d/api", *apiPortFlag), "", db, &abstractFaucet, *contentDirFlag) // Initialize API instance
+	api := standardapi.NewJSONHTTPAPI(fmt.Sprintf(":%d/api", *apiPortFlag), "", db, &abstractFaucet, *contentDirFlag, *useEventStream) // Initialize API instance
 
 	err = api.StartServing() // Start serving
 

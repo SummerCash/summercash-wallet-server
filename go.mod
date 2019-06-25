@@ -19,6 +19,7 @@ require (
 	github.com/libp2p/go-libp2p-core v0.0.3 // indirect
 	github.com/libp2p/go-msgio v0.0.3 // indirect
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
+	github.com/r3labs/sse v0.0.0-20190530104643-3c23fe8c6bd2
 	github.com/valyala/fasthttp v1.3.0
 	go.opencensus.io v0.22.0 // indirect
 	golang.org/x/crypto v0.0.0-20190611184440-5c40567a22f8
@@ -26,4 +27,5 @@ require (
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sys v0.0.0-20190610200419-93c9922d18ae // indirect
 	google.golang.org/appengine v1.6.1 // indirect
+	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 )

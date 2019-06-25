@@ -4,6 +4,7 @@ package standardapi
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -11,6 +12,7 @@ import (
 
 	fasthttprouter "github.com/fasthttp/router"
 	"github.com/juju/loggo"
+	"github.com/r3labs/sse"
 	"github.com/valyala/fasthttp"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -30,6 +32,10 @@ type JSONHTTPAPI struct {
 
 	Router *fasthttprouter.Router `json:"-"` // Router
 
+	EventServer *sse.Server `json:"-"` // SSE Server
+
+	Mux *http.ServeMux `json:"-"` // Mux
+
 	ContentRouter *fasthttprouter.Router `json:"-"` // Content router
 
 	AccountsDatabase *accounts.DB `json:"-"` // Accounts database
@@ -47,14 +53,26 @@ type errorResponse struct {
 /* BEGIN EXPORTED METHODS */
 
 // NewJSONHTTPAPI initializes a new JSONHTTPAPI instance.
-func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string) *JSONHTTPAPI {
+func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string, useEventStream bool) *JSONHTTPAPI {
+	var sseServer *sse.Server    // Init server buffer
+	var serverMux *http.ServeMux // Init server mux buffer
+
+	if useEventStream { // Check should use event stream
+		sseServer = sse.New()          // Initialize sse server
+		serverMux = http.NewServeMux() // Init server mux
+
+		serverMux.HandleFunc("/events", sseServer.HTTPHandler) // Handle requests
+	}
+
 	return &JSONHTTPAPI{
 		BaseURI:          baseURI,    // Set base URI
 		Provider:         provider,   // Set provider
 		AccountsDatabase: accountsDB, // Set accounts DB
 		ContentDir:       contentDir, // Set content dir
 		Faucet:           faucet,     // Set faucet
-	}
+		EventServer:      sseServer,  // Set sse server
+		Mux:              serverMux,  // Set mux
+	} // Initialize API
 }
 
 // GetAvailableAPIs gets the available APIs.
@@ -116,6 +134,10 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
+	if api.EventServer != nil { // Check uses event stream
+		go http.ListenAndServeTLS(":2096", "generalCert.pem", "generalKey.pem", api.Mux) // Start listening
+	}
+
 	switch serveContent {
 	case true:
 		go fasthttp.ListenAndServeTLS(strings.Split(api.BaseURI, "/api")[0], "generalCert.pem", "generalKey.pem", api.Router.Handler) // Start serving
@@ -131,10 +153,6 @@ func (api *JSONHTTPAPI) StartServing() error {
 		if err != nil { // Check for errors
 			return err // Return found error
 		}
-	}
-
-	if serveContent { // Check can serve content dir
-
 	}
 
 	return nil // No error occurred, return nil
