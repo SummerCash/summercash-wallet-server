@@ -22,7 +22,8 @@ func (api *JSONHTTPAPI) SetupStreams() error {
 	}
 
 	for _, username := range accountUsernames { // Iterate through account usernames
-		api.EventServer.CreateStream(fmt.Sprintf("%s_transactions", username)) // Initialize account stream
+		api.EventServer.CreateStream(fmt.Sprintf("%s_transactions", username)) // Initialize account transactions stream
+		api.EventServer.CreateStream(fmt.Sprintf("%s_balance", username))      // Initialize account balance stream
 	}
 
 	return nil // No error occurred, return nil

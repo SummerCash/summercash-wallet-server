@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/NaySoftware/go-fcm"
-	"github.com/valyala/fasthttp"
 	"github.com/r3labs/sse"
+	"github.com/valyala/fasthttp"
 
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/summercash-wallet-server/common"
@@ -100,9 +100,35 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 		client.NewFcmRegIdsMsg(recipientAccount.FcmTokens, data) // Init message
 
 		if api.EventServer != nil { // Check has event server
+			balance, err := api.AccountsDatabase.GetUserBalance(recipientAccount.Name) // Get balance
+
+			if err != nil { // Check for errors
+				logger.Errorf("errored while handling NewTransaction request with username %s: %s", recipientAccount.Name, err.Error()) // Log error
+			}
+
 			api.EventServer.Publish(fmt.Sprintf("%s_transactions", recipientAccount.Name), &sse.Event{
 				Data: []byte(transaction.String()),
 			}) // Publish new tx
+
+			api.EventServer.Publish(fmt.Sprintf("%s_balance", recipientAccount.Name), &sse.Event{
+				Data: []byte(balance.String()),
+			}) // Publish new balance
+
+			username := string(common.GetCtxValue(ctx, "username")) // Get sender username
+
+			balance, err = api.AccountsDatabase.GetUserBalance(username)
+
+			if err != nil { // Check for errors
+				logger.Errorf("errored while handling NewTransaction request with username %s: %s", username, err.Error()) // Log error
+			}
+
+			api.EventServer.Publish(fmt.Sprintf("%s_transactions", string(common.GetCtxValue(ctx, "username"))), &sse.Event{
+				Data: []byte(transaction.String()),
+			}) // Publish new tx
+
+			api.EventServer.Publish(fmt.Sprintf("%s_balance", string(common.GetCtxValue(ctx, "username"))), &sse.Event{
+				Data: []byte(balance.String()),
+			}) // Publish new balance
 		}
 
 		_, err = client.Send() // Send notification
