@@ -11,6 +11,7 @@ require (
 	github.com/btcsuite/btcd v0.0.0-20190605094302-a0d1e3e36d50 // indirect
 	github.com/dowlandaiello/go-simplesub v0.0.0-20190530171458-9d2a71eaf57f // indirect
 	github.com/fasthttp/router v0.3.4
+	github.com/gin-gonic/gin v1.4.0
 	github.com/gorilla/websocket v1.4.0
 	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8
@@ -20,6 +21,7 @@ require (
 	github.com/libp2p/go-libp2p-core v0.0.3 // indirect
 	github.com/libp2p/go-msgio v0.0.3 // indirect
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
+	github.com/olahol/melody v0.0.0-20180227134253-7bd65910e5ab
 	github.com/r3labs/sse v0.0.0-20190530104643-3c23fe8c6bd2
 	github.com/valyala/fasthttp v1.3.0
 	go.opencensus.io v0.22.0 // indirect

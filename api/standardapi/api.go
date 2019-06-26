@@ -4,15 +4,15 @@ package standardapi
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime/debug"
 	"strings"
 
 	fasthttprouter "github.com/fasthttp/router"
+	"github.com/gin-gonic/gin"
 	"github.com/juju/loggo"
-	"github.com/r3labs/sse"
+	"github.com/olahol/melody"
 	"github.com/valyala/fasthttp"
 
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -32,9 +32,9 @@ type JSONHTTPAPI struct {
 
 	Router *fasthttprouter.Router `json:"-"` // Router
 
-	EventServer *sse.Server `json:"-"` // SSE Server
+	MiscAPIRouter *gin.Engine `json:"-"` // Gin engine
 
-	Mux *http.ServeMux `json:"-"` // Mux
+	Melody *melody.Melody `json:"-"` // Melody instance
 
 	ContentRouter *fasthttprouter.Router `json:"-"` // Content router
 
@@ -57,13 +57,13 @@ type errorResponse struct {
 /* BEGIN EXPORTED METHODS */
 
 // NewJSONHTTPAPI initializes a new JSONHTTPAPI instance.
-func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string, useEventStream bool, useWebsocket bool) *JSONHTTPAPI {
-	var sseServer *sse.Server    // Init server buffer
-	var serverMux *http.ServeMux // Init server mux buffer
+func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string, useWebsocket bool) *JSONHTTPAPI {
+	var ginEngine *gin.Engine // Init gin engine buffer
+	var m *melody.Melody      // Init melody buffer
 
-	if useEventStream { // Check should use event stream
-		sseServer = sse.New()          // Initialize sse server
-		serverMux = http.NewServeMux() // Init server mux
+	if useWebsocket { // Check should use event stream
+		ginEngine = gin.Default() // Init gin engine
+		m = melody.New()          // Set new melody
 	}
 
 	return &JSONHTTPAPI{
@@ -72,8 +72,8 @@ func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, fa
 		AccountsDatabase: accountsDB,   // Set accounts DB
 		ContentDir:       contentDir,   // Set content dir
 		Faucet:           faucet,       // Set faucet
-		EventServer:      sseServer,    // Set sse server
-		Mux:              serverMux,    // Set mux
+		MiscAPIRouter:    ginEngine,    // Set gin engine
+		Melody:           m,            // Set melody
 		UseWebsocket:     useWebsocket, // Set should use websocket
 	} // Initialize API
 }
@@ -137,22 +137,10 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
-	if api.EventServer != nil || api.Mux != nil { // Check uses event stream
-		if api.EventServer != nil { // Check has event server
-			err = api.SetupStreams() // Setup streams
+	if api.UseWebsocket { // Check should use websockets
+		err = api.SetupWebsocketRoutes() // Setup websocket support
 
-			if err != nil { // Check for errors
-				return err // Return found error
-			}
-
-			api.Mux.HandleFunc("/events", api.EventServer.HTTPHandler) // Handle requests
-		}
-
-		if api.UseWebsocket { // Check should use websockets
-			err = api.SetupWebsocketRoutes() // Setup websocket support
-		}
-
-		go http.ListenAndServe(":2096", api.Mux) // Start listening
+		go api.MiscAPIRouter.Run(":2086") // Start listening
 	}
 
 	switch serveContent {
