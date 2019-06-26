@@ -152,7 +152,7 @@ func (api *JSONHTTPAPI) StartServing() error {
 			err = api.SetupWebsocketRoutes() // Setup websocket support
 		}
 
-		go http.ListenAndServeTLS(":2096", "generalCert.pem", "generalKey.pem", api.Mux) // Start listening
+		go http.ListenAndServe(":2096", api.Mux) // Start listening
 	}
 
 	switch serveContent {
