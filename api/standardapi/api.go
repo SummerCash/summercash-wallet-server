@@ -60,8 +60,6 @@ func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, fa
 	if useEventStream { // Check should use event stream
 		sseServer = sse.New()          // Initialize sse server
 		serverMux = http.NewServeMux() // Init server mux
-
-		serverMux.HandleFunc("/events", sseServer.HTTPHandler) // Handle requests
 	}
 
 	return &JSONHTTPAPI{
@@ -135,6 +133,14 @@ func (api *JSONHTTPAPI) StartServing() error {
 	}
 
 	if api.EventServer != nil { // Check uses event stream
+		err = api.SetupStreams() // Setup streams
+
+		if err != nil { // Check for errors
+			return err // Return found error
+		}
+
+		api.Mux.HandleFunc("/events", api.EventServer.HTTPHandler) // Handle requests
+
 		go http.ListenAndServeTLS(":2096", "generalCert.pem", "generalKey.pem", api.Mux) // Start listening
 	}
 
