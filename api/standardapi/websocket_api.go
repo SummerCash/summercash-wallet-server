@@ -2,8 +2,7 @@
 package standardapi
 
 import (
-	"bytes"
-	"encoding/json"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/olahol/melody"
@@ -18,7 +17,7 @@ type ConnectionManager struct {
 
 // SetupWebsocketRoutes sets up all the websocket api-related routes.
 func (api *JSONHTTPAPI) SetupWebsocketRoutes() error {
-	websocketAPIRoot := "/ws" // Get websocket API root path.
+	websocketAPIRoot := "/ws/:username" // Get websocket API root path.
 
 	api.WebsocketManager = &ConnectionManager{
 		Clients: make(map[string]*melody.Session), // Set client manager
@@ -38,33 +37,8 @@ func (api *JSONHTTPAPI) HandleWebsocketGet(c *gin.Context) {
 
 // HandleConnection handles an incoming WebSocket connection.
 func (api *JSONHTTPAPI) HandleConnection(s *melody.Session) {
-	decoder := json.NewDecoder(s.Request.Body) // Initialize JSON decoder
-
-	jsonMap := make(map[string]*json.RawMessage) // Init JSON map buffer
-
-	err := decoder.Decode(&jsonMap) // Decode into JSON map
-
-	if err != nil { // Check for errors
-		s.Write([]byte(err.Error())) // Write error
-
-		logger.Errorf("errored while handling new WebSocket connection: %s", err.Error()) // Log error
-
-		return // Return
-	}
-
-	usernameByteVal, err := jsonMap["username"].MarshalJSON() // Marshal JSON
-
-	if err != nil { // Check for errors
-		s.Write([]byte(err.Error())) // Write error
-
-		logger.Errorf("errored while handling new WebSocket connection: %s", err.Error()) // Log error
-
-		return // Return
-	}
-
-	usernameByteVal = bytes.Replace(usernameByteVal, []byte(`"`), []byte{}, 2) // Get rid of JSON quotes
-
-	api.WebsocketManager.Clients[string(usernameByteVal)] = s // Set session
+	fmt.Println(s.Request.URL.String())
+	// api.WebsocketManager.Clients[s.Request.] = s // Set session
 }
 
 /* END EXPORTED METHODS */
