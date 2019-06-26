@@ -94,6 +94,48 @@ func (api *JSONHTTPAPI) NewTransaction(ctx *fasthttp.RequestCtx) {
 			"sum": fmt.Sprintf("Received %f SMC from %s.", amount, transaction.Sender.String()),
 		}
 
+		if api.WebsocketManager != nil && api.UseWebsocket { // Check uses websockets
+			recipient := string(common.GetCtxValue(ctx, "recipient")) // Get recipient username
+
+			sender := string(common.GetCtxValue(ctx, "username")) // Get sender username
+
+			if !strings.Contains(recipient, "0x") { // Check recipient has username
+				recipientBalance, err := api.AccountsDatabase.GetUserBalance(recipient) // Calculate recipient balance
+
+				if err != nil { // Check for errors
+					logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+
+					panic(err) // Panic
+				}
+
+				recipientFloatBalance, _ := recipientBalance.Float64() // Get float value
+
+				payload := []byte(fmt.Sprintf("%f:%s", recipientFloatBalance, transaction.String())) // Initialize payload
+
+				for _, session := range api.WebsocketManager.Clients[recipient] { // Iterate through recipient WS sessions
+					session.Write(payload) // Write payload
+				}
+			}
+
+			if !strings.Contains(sender, "0x") { // Check sender has username
+				senderBalance, err := api.AccountsDatabase.GetUserBalance(sender) // Calculate sender balance
+
+				if err != nil { // Check for errors
+					logger.Errorf("errored while handling NewTransaction request with username %s: %s", string(common.GetCtxValue(ctx, "username")), err.Error()) // Log error
+
+					panic(err) // Panic
+				}
+
+				senderFloatBalance, _ := senderBalance.Float64() // Get float value
+
+				payload := []byte(fmt.Sprintf("%f:%s", senderFloatBalance, transaction.String())) // Initialize payload
+
+				for _, session := range api.WebsocketManager.Clients[sender] { // Iterate through sender WS sessions
+					session.Write(payload) // Write payload
+				}
+			}
+		}
+
 		client := fcm.NewFcmClient(os.Getenv("FCM_KEY")) // Init client
 
 		client.NewFcmRegIdsMsg(recipientAccount.FcmTokens, data) // Init message
