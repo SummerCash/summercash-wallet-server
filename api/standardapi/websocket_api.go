@@ -37,8 +37,8 @@ func (api *JSONHTTPAPI) HandleWebsocketGet(c *gin.Context) {
 
 // HandleConnection handles an incoming WebSocket connection.
 func (api *JSONHTTPAPI) HandleConnection(s *melody.Session) {
-	fmt.Println(s.Request.URL.String())
-	// api.WebsocketManager.Clients[s.Request.] = s // Set session
+	fmt.Println(s.Request.URL.Query()["username"][0])
+	api.WebsocketManager.Clients[s.Request.URL.Query()["username"][0]] = s // Set session
 }
 
 /* END EXPORTED METHODS */
