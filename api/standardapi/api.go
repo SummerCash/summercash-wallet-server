@@ -43,6 +43,10 @@ type JSONHTTPAPI struct {
 	Faucet *faucet.Faucet `json:"-"` // Faucet
 
 	ContentDir string `json:"content_dir"` // Static content directory
+
+	WebsocketManager *ConnectionManager `json:"manager"` // WebSocket connection manager
+
+	UseWebsocket bool `json:"should_use_websocket"` // Should use websocket
 }
 
 // errorResponse represents a JSON error.
@@ -53,7 +57,7 @@ type errorResponse struct {
 /* BEGIN EXPORTED METHODS */
 
 // NewJSONHTTPAPI initializes a new JSONHTTPAPI instance.
-func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string, useEventStream bool) *JSONHTTPAPI {
+func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, faucet *faucet.Faucet, contentDir string, useEventStream bool, useWebsocket bool) *JSONHTTPAPI {
 	var sseServer *sse.Server    // Init server buffer
 	var serverMux *http.ServeMux // Init server mux buffer
 
@@ -63,13 +67,14 @@ func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, fa
 	}
 
 	return &JSONHTTPAPI{
-		BaseURI:          baseURI,    // Set base URI
-		Provider:         provider,   // Set provider
-		AccountsDatabase: accountsDB, // Set accounts DB
-		ContentDir:       contentDir, // Set content dir
-		Faucet:           faucet,     // Set faucet
-		EventServer:      sseServer,  // Set sse server
-		Mux:              serverMux,  // Set mux
+		BaseURI:          baseURI,      // Set base URI
+		Provider:         provider,     // Set provider
+		AccountsDatabase: accountsDB,   // Set accounts DB
+		ContentDir:       contentDir,   // Set content dir
+		Faucet:           faucet,       // Set faucet
+		EventServer:      sseServer,    // Set sse server
+		Mux:              serverMux,    // Set mux
+		UseWebsocket:     useWebsocket, // Set should use websocket
 	} // Initialize API
 }
 
@@ -132,14 +137,20 @@ func (api *JSONHTTPAPI) StartServing() error {
 		return err // Return found error
 	}
 
-	if api.EventServer != nil { // Check uses event stream
-		err = api.SetupStreams() // Setup streams
+	if api.EventServer != nil || api.Mux != nil { // Check uses event stream
+		if api.EventServer != nil { // Check has event server
+			err = api.SetupStreams() // Setup streams
 
-		if err != nil { // Check for errors
-			return err // Return found error
+			if err != nil { // Check for errors
+				return err // Return found error
+			}
+
+			api.Mux.HandleFunc("/events", api.EventServer.HTTPHandler) // Handle requests
 		}
 
-		api.Mux.HandleFunc("/events", api.EventServer.HTTPHandler) // Handle requests
+		if api.UseWebsocket { // Check should use websockets
+			err = api.SetupWebsocketRoutes() // Setup websocket support
+		}
 
 		go http.ListenAndServeTLS(":2096", "generalCert.pem", "generalKey.pem", api.Mux) // Start listening
 	}
