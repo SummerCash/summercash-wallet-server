@@ -3,6 +3,7 @@ package standardapi
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/olahol/melody"
@@ -37,8 +38,9 @@ func (api *JSONHTTPAPI) HandleWebsocketGet(c *gin.Context) {
 
 // HandleConnection handles an incoming WebSocket connection.
 func (api *JSONHTTPAPI) HandleConnection(s *melody.Session) {
-	fmt.Println(s.Request.URL.Query()["username"][0])
-	api.WebsocketManager.Clients[s.Request.URL.Query()["username"][0]] = s // Set session
+	fmt.Println(strings.SplitN(s.Request.URL.String(), "/", 1)[1])
+
+	api.WebsocketManager.Clients[strings.SplitN(s.Request.URL.String(), "/", 1)[1]] = s // Set session
 }
 
 /* END EXPORTED METHODS */
