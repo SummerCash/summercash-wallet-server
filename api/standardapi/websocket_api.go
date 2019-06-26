@@ -2,7 +2,6 @@
 package standardapi
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -38,9 +37,9 @@ func (api *JSONHTTPAPI) HandleWebsocketGet(c *gin.Context) {
 
 // HandleConnection handles an incoming WebSocket connection.
 func (api *JSONHTTPAPI) HandleConnection(s *melody.Session) {
-	fmt.Println(strings.SplitN(s.Request.URL.String(), "/", 1)[1])
+	splitURL := strings.Split(s.Request.URL.String(), "/") // Split URL
 
-	api.WebsocketManager.Clients[strings.SplitN(s.Request.URL.String(), "/", 1)[1]] = s // Set session
+	api.WebsocketManager.Clients[splitURL[len(splitURL)-1]] = s // Set session
 }
 
 /* END EXPORTED METHODS */
