@@ -10,7 +10,7 @@ import (
 
 // ConnectionManager manages a set of active websocket connections.
 type ConnectionManager struct {
-	Clients map[string]*melody.Session `json:"clients"` // Connected clients
+	Clients map[string][]*melody.Session `json:"clients"` // Connected clients
 }
 
 /* BEGIN EXPORTED METHODS */
@@ -20,7 +20,7 @@ func (api *JSONHTTPAPI) SetupWebsocketRoutes() error {
 	websocketAPIRoot := "/ws/:username" // Get websocket API root path.
 
 	api.WebsocketManager = &ConnectionManager{
-		Clients: make(map[string]*melody.Session), // Set client manager
+		Clients: make(map[string][]*melody.Session), // Set client manager
 	}
 
 	api.MiscAPIRouter.GET(websocketAPIRoot, api.HandleWebsocketGet) // Set /ws handler
@@ -39,7 +39,23 @@ func (api *JSONHTTPAPI) HandleWebsocketGet(c *gin.Context) {
 func (api *JSONHTTPAPI) HandleConnection(s *melody.Session) {
 	splitURL := strings.Split(s.Request.URL.String(), "/") // Split URL
 
-	api.WebsocketManager.Clients[splitURL[len(splitURL)-1]] = s // Set session
+	username := splitURL[len(splitURL)-1] // Get last element in split URL
+
+	api.WebsocketManager.Clients[username] = append(api.WebsocketManager.Clients[username], s) // Append session to user sessions
+}
+
+// HandleDisconnect handles a disconnected WebSocket connection.
+func (api *JSONHTTPAPI) HandleDisconnect(s *melody.Session) {
+	splitURL := strings.Split(s.Request.URL.String(), "/") // Split URL
+
+	username := splitURL[len(splitURL)-1] // Get last element in split URL
+
+	for i, currentSession := range api.WebsocketManager.Clients[username] { // Iterate through listening clients in scope of username
+		if currentSession == s { // Check is same session
+			api.WebsocketManager.Clients[username][i] = api.WebsocketManager.Clients[username][len(api.WebsocketManager.Clients[username])-1] // Clear slot
+			api.WebsocketManager.Clients[username] = api.WebsocketManager.Clients[username][:len(api.WebsocketManager.Clients[username])-1]   // Remove from list of listening clients
+		}
+	}
 }
 
 /* END EXPORTED METHODS */
