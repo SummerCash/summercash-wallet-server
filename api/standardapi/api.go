@@ -4,6 +4,7 @@ package standardapi
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -63,7 +64,9 @@ func NewJSONHTTPAPI(baseURI string, provider string, accountsDB *accounts.DB, fa
 
 	if useWebsocket { // Check should use event stream
 		ginEngine = gin.Default() // Init gin engine
-		m = melody.New()          // Set new melody
+
+		m = melody.New()                                                    // Set new melody
+		m.Upgrader.CheckOrigin = func(r *http.Request) bool { return true } // Of CORS, *facepalm*
 	}
 
 	return &JSONHTTPAPI{
