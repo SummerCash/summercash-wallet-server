@@ -32,7 +32,13 @@ func (api *JSONHTTPAPI) SetupWebsocketRoutes() error {
 
 // HandleWebsocketGet handles an incoming GET request for the /ws path.
 func (api *JSONHTTPAPI) HandleWebsocketGet(c *gin.Context) {
-	api.Melody.HandleRequest(c.Writer, c.Request) // Handle request
+	logger.Infof("handling WebSocket GET request from addr %s", c.ClientIP()) // Log accepted request
+
+	err := api.Melody.HandleRequest(c.Writer, c.Request) // Handle request
+
+	if err != nil { // Check for errors
+		logger.Errorf("errored while handling WebSocket GET request from addr %s: %s", c.ClientIP(), err.Error()) // Log found error
+	}
 }
 
 // HandleConnection handles an incoming WebSocket connection.
