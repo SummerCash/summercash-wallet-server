@@ -20,6 +20,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 
+	summercashAccounts "github.com/SummerCash/go-summercash/accounts"
 	summercashCommon "github.com/SummerCash/go-summercash/common"
 	"github.com/SummerCash/go-summercash/types"
 	"github.com/SummerCash/summercash-wallet-server/accounts"
@@ -77,8 +78,52 @@ func (api *JSONHTTPAPI) SetupAccountRoutes() error {
 	api.Router.POST(fmt.Sprintf("%s/:username/pushtoken", accountsAPIRoot), api.SetAccountPushToken)           // Set AccountPushToken
 	api.Router.POST(fmt.Sprintf("%s/oauth/login", oauthAPIRoot), api.OauthLogin)                               // Set Authorize post
 	api.Router.POST(fmt.Sprintf("%s/oauth/callback", oauthAPIRoot), api.OauthCallback)                         // Set Oauth post
+	api.Router.POST(fmt.Sprintf("%s/:username/getPrivatekey", accountsAPIRoot), api.GetAccountPrivateKey)      // Set get PK post
 
 	return nil // No error occurred, return nil
+}
+
+// GetAccountPrivateKey handles a GetAccountPrivateKey request.
+func (api *JSONHTTPAPI) GetAccountPrivateKey(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")             // Allow CORS
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	ctx.Response.Header.Set("Content-Type", "application/json")             // Set content type
+
+	account, err := api.AccountsDatabase.QueryAccountByUsername(ctx.UserValue("username").(string)) // Get account
+	if err != nil {                                                                                 // Check for errors
+		logger.Errorf("errored while handling GetAccountPrivateKey request: %s", err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	if !api.AccountsDatabase.Auth(account.Name, string(common.GetCtxValue(ctx, "password"))) { // Check invalid credentials
+		logger.Errorf("errored while handling GetAccountPrivateKey request: %s", accounts.ErrPasswordInvalid) // Log error
+
+		panic(accounts.ErrPasswordInvalid) // Panic
+	}
+
+	summercashAccount, err := summercashAccounts.ReadAccountFromMemory(account.Address) // Read account from memory
+	if err != nil {                                                                     // Check for errors
+		logger.Errorf("errored while handling GetAccountPrivateKey request: %s", accounts.ErrPasswordInvalid) // Log error
+
+		panic(accounts.ErrPasswordInvalid) // Panic
+	}
+
+	err = summercashAccount.MakeEncodingSafe() // Make encoding safe
+	if err != nil {                            // Check for errors
+		logger.Errorf("errored while handling GetAccountPrivateKey request: %s", err.Error()) // Log error
+
+		panic(err) // Panic
+	}
+
+	fmt.Fprintf(ctx, summercashAccount.String()) // Write pk
+
+	err = summercashAccount.RecoverSafeEncoding() // Recover encoding
+	if err != nil {                               // Check for errors
+		logger.Errorf("errored while handling GetAccountPrivateKey request: %s", err.Error()) // Log error
+
+		panic(err) // Panic
+	}
 }
 
 // OauthLogin handles an OauthLogin request.
