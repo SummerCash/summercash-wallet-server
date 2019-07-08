@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -116,7 +117,7 @@ func (api *JSONHTTPAPI) GetAccountPrivateKey(ctx *fasthttp.RequestCtx) {
 		panic(err) // Panic
 	}
 
-	fmt.Fprintf(ctx, summercashAccount.String()) // Write pk
+	fmt.Fprintf(ctx, hex.EncodeToString(summercashAccount.SerializedPrivateKey)) // Write pk
 
 	err = summercashAccount.RecoverSafeEncoding() // Recover encoding
 	if err != nil {                               // Check for errors
