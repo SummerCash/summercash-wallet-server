@@ -1,0 +1,20 @@
+language: go
+
+env:
+  global:
+  - GO111MODULE=on DOCKER_USERNAME=summercashbot
+
+services:
+  - docker
+
+notifications:
+  email: false
+
+install:
+  - export GO111MODULE=on
+  - go get -u
+
+install: true
+
+script:
+  - go test ./...
